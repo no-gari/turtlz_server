@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "django_settings": "configs.settings",
+        "profile_name": "change",
+        "project_name": "ustain-backendv",
+        "runtime": "python3.9",
+        "s3_bucket": "zappa-k1qmor723",
+        "aws_region": "ap-northeast-2"
+    }
+}
