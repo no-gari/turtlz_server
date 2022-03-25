@@ -1,22 +1,14 @@
 import datetime
-import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'pj%2ze09(g)i^joilp-f8gvs)6ou_m036u3ejs^ky&9nse5k92'
 
-ALLOWED_HOSTS = [
-    '*.ap-northeast-2.elasticbeanstalk.com'
-]
+ALLOWED_HOSTS = ['*.ap-northeast-2.elasticbeanstalk.com']
 
-# Application definition
 DJANGO_APPS = [
+    'admin_menu',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,9 +31,10 @@ THIRD_PARTY_APPS = [
     'rest_framework',
 ]
 
-SITE_ID = 1
-
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+
+SITE_ID = 1
+AUTH_USER_MODEL = 'user.User'
 
 # HOST
 DEFAULT_HOST = 'api'
@@ -74,8 +67,6 @@ TEMPLATES = [
 ]
 
 # Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -91,32 +82,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
+SITE_NAME = 'ustain'
 
 LANGUAGE_CODE = 'ko'
-
 TIME_ZONE = 'Asia/Seoul'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = False
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-SITE_NAME = 'ustain'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
-
-# AUTH_USER_MODEL
-AUTH_USER_MODEL = 'user.User'
 
 # APPLICATION
 WSGI_APPLICATION = 'configs.wsgi.application'
@@ -149,16 +127,6 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y.%m.%d',
 }
 
-# SWAGGER
-SWAGGER_SETTINGS = {
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'config.swagger.SquadSwaggerAutoSchema',
-    'USE_SESSION_AUTH': True,
-    'DOC_EXPANSION': 'list',
-    'APIS_SORTER': 'alpha',
-    'SECURITY_DEFINITIONS': None,
-    'DEFAULT_API_URL': 'http://127.0.0.1:8000/docs'
-}
-
 # COOLSMS
 COOLSMS_API_KEY = 'NCSMVIWDWDVLDXLG'
 COOLSMS_API_SECRET = 'N9KGGSNNCBONQZAYKEP8QDIMPBISY8PS'
@@ -168,7 +136,6 @@ COOLSMS_FROM_PHONE = '01083589504'
 MAILGUN_API_KEY = "a1209bfad6ca285a9ad2e0d7c1356b80-a0cfb957-2866bfcd"
 MAILGUN_DOMAIN = "https://api.mailgun.net/v3/api.ustain.be"
 MAILGUN_FROM_EMAIL = 'sofaissofa@icloud.com'
-
 
 # KAKAO_LOGIN
 KAKAO_API_KEY = '834031fe8f729b4ce1c4d1865bccd63a'
