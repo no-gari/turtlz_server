@@ -24,11 +24,12 @@ LOCAL_APPS = [
     'api.commerce.apps.CommerceConfig',
     'api.magazine.apps.MagazineConfig',
     'api.community.apps.CommunityConfig',
+    'api.firebase_push.apps.FirebasePushConfig',
 ]
 
 THIRD_PARTY_APPS = [
-    # 'storages',
     'rest_framework',
+    'storages',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS

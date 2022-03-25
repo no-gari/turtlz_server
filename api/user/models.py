@@ -38,8 +38,8 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-    VERIFY_FIELDS = []  # 회원가입 시 검증 받을 필드 (email, phone)
-    REGISTER_FIELDS = ['phone']  # 회원가입 시 입력 받을 필드 (email, phone, password)
+    VERIFY_FIELDS = []
+    REGISTER_FIELDS = ['phone']
 
     objects = UserManager()
 
