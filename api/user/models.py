@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
 from api.utils import FilenameChanger
 from django.db import models
+import datetime
 
 
 class UserManager(DjangoUserManager):
@@ -58,10 +59,10 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nickname = models.CharField(max_lenght=32, verbose_name='닉네임', null=True, blank=True)
+    nickname = models.CharField(max_length=32, verbose_name='닉네임', null=True, blank=True)
     profile_image = models.ImageField(verbose_name='프로필 사진', null=True, blank=True, upload_to=FilenameChanger('profile'))
-    created_at = models.DateTimeField(verbose_name='생성일자', auto_now_add=True)
-    kind = models.CharField(verbose_name='종류', null=True, blank=True)
+    created_at = models.DateTimeField(verbose_name='생성일자', auto_now_add=True, null=True, blank=True)
+    kind = models.CharField(max_length=32, verbose_name='종류', null=True, blank=True)
 
     class Meta:
         verbose_name = '프로필'
