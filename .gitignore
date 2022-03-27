@@ -17,3 +17,5 @@ media
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+# secret contents
+/configs/secrets.py

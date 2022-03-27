@@ -2,5 +2,8 @@ from django.apps import AppConfig
 
 
 class LoggerConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
     name = 'api.logger'
+    verbose_name = '발송 기록'
+
+    def ready(self):
+        import api.logger.signals

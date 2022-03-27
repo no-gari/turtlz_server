@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
+from api.utils import FilenameChanger
 from django.db import models
 
 
@@ -33,7 +34,6 @@ class User(AbstractUser):
     last_name = None
     username = None
     email = models.EmailField(verbose_name='이메일', unique=True)
-    name = models.CharField(verbose_name='닉네임', max_length=16)
     phone = models.CharField(verbose_name='휴대폰', max_length=11, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
@@ -58,8 +58,10 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_message = models.CharField(max_length=256, verbose_name='프로필 메세지')
-    profile_image = models.ImageField()
+    nickname = models.CharField(max_lenght=32, verbose_name='닉네임', null=True, blank=True)
+    profile_image = models.ImageField(verbose_name='프로필 사진', null=True, blank=True, upload_to=FilenameChanger('profile'))
+    created_at = models.DateTimeField(verbose_name='생성일자', auto_now_add=True)
+    kind = models.CharField(verbose_name='종류', null=True, blank=True)
 
     class Meta:
         verbose_name = '프로필'
@@ -72,15 +74,6 @@ class Profile(models.Model):
 class SocialKindChoices(models.TextChoices):
     KAKAO = 'kakao', '카카오'
     APPLE = 'apple', '애플'
-
-
-class Social(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    kind = models.CharField(verbose_name='타입', max_length=16, choices=SocialKindChoices.choices)
-
-    class Meta:
-        verbose_name = '소셜'
-        verbose_name_plural = verbose_name
 
 
 class EmailVerifier(models.Model):

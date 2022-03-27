@@ -7,6 +7,7 @@ SECRET_KEY = 'pj%2ze09(g)i^joilp-f8gvs)6ou_m036u3ejs^ky&9nse5k92'
 
 ALLOWED_HOSTS = ['*.ap-northeast-2.elasticbeanstalk.com']
 
+# BASE DJANGO APPS
 DJANGO_APPS = [
     'admin_menu',
     'django.contrib.admin',
@@ -18,6 +19,7 @@ DJANGO_APPS = [
     'django.contrib.sites',
 ]
 
+# LOCAL API APPS
 LOCAL_APPS = [
     'api.user.apps.UserConfig',
     'api.logger.apps.LoggerConfig',
@@ -27,13 +29,22 @@ LOCAL_APPS = [
     'api.firebase_push.apps.FirebasePushConfig',
 ]
 
+# OTHER LIBRARIES
 THIRD_PARTY_APPS = [
-    'rest_framework',
     'storages',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'allauth',
+    'dj_rest_auth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.apple',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
+# DJANGO BASE USER MODEL
 SITE_ID = 1
 AUTH_USER_MODEL = 'user.User'
 
@@ -42,6 +53,7 @@ DEFAULT_HOST = 'api'
 ROOT_HOSTCONF = 'configs.hosts'
 ROOT_URLCONF = 'configs.urls'
 
+# MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -83,17 +95,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ADMIN SITE NAME
 SITE_NAME = 'ustain'
 
+# BASE DJANGO LOCATION
 LANGUAGE_CODE = 'ko'
 TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = False
 
+# BASE STATIC, MEDIA ROOT
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
 
@@ -111,7 +125,8 @@ SIMPLE_JWT = {
 # DJANGO REST FRAMEWORK
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'api.user.serializers.login.CustomJWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'api.user.serializers.login.CustomJWTAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
@@ -140,17 +155,10 @@ MAILGUN_FROM_EMAIL = 'sofaissofa@icloud.com'
 
 # KAKAO_LOGIN
 KAKAO_API_KEY = '834031fe8f729b4ce1c4d1865bccd63a'
+KAKAO_CLIENT_SECRET = 'ArCJdOXV5GszOyZUj6WOqliE8bJ4DfUB'
+KAKAO_LOGIN_URL = 'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${SOCIAL_REDIRECT_URL}&state=kakao'
 
-# CORS
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-    # "clayful",
-]
+# APPLE
+APPLE_CLIENT_ID = '123'
+APPLE_CLIENT_SECRET = ''
+APPLE_LOGIN_URL = 'https://appleid.apple.com/auth/authorize?response_type=code&client_id=${APPLE_CLIENT_ID}&redirect_uri={SOCIAL_REDIRECT_URL}&state=apple'
