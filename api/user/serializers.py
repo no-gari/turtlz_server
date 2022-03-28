@@ -14,7 +14,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.exceptions import ValidationError as DjangoValidationError
-from api.user.models import User, EmailVerifier, PhoneVerifier, Social, SocialKindChoices, Profile
+from api.user.models import User, EmailVerifier, PhoneVerifier, SocialKindChoices, Profile
 
 
 class UserSocialLoginSerializer(serializers.Serializer):

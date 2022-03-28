@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
 from api.utils import FilenameChanger
 from django.db import models
-import datetime
 
 
 class UserManager(DjangoUserManager):

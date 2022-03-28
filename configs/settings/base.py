@@ -23,10 +23,25 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     'api.user.apps.UserConfig',
     'api.logger.apps.LoggerConfig',
-    'api.commerce.apps.CommerceConfig',
     'api.magazine.apps.MagazineConfig',
     'api.community.apps.CommunityConfig',
     'api.firebase_push.apps.FirebasePushConfig',
+]
+
+# COMMERCE API APPS
+COMMERCE_APPS = [
+    'api.commerce.cart.apps.CartConfig',
+    'api.commerce.order.apps.OrderConfig',
+    'api.commerce.brand.apps.BrandConfig',
+    'api.commerce.review.apps.ReviewConfig',
+    'api.commerce.coupon.apps.CouponConfig',
+    'api.commerce.payment.apps.PaymentConfig',
+    'api.commerce.product.apps.ProductConfig',
+    'api.commerce.invoice.apps.InvoiceConfig',
+    'api.commerce.address.apps.AddressConfig',
+    'api.commerce.category.apps.CategoryConfig',
+    'api.commerce.checkout.apps.CheckoutConfig',
+    'api.commerce.order_item.apps.OrderItemConfig',
 ]
 
 # OTHER LIBRARIES
@@ -42,7 +57,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount.providers.apple',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + COMMERCE_APPS + THIRD_PARTY_APPS
 
 # DJANGO BASE USER MODEL
 SITE_ID = 1
