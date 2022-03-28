@@ -1,7 +1,7 @@
 import datetime
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'pj%2ze09(g)i^joilp-f8gvs)6ou_m036u3ejs^ky&9nse5k92'
 
@@ -23,6 +23,7 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     'api.user.apps.UserConfig',
     'api.logger.apps.LoggerConfig',
+    'api.search.apps.SearchConfig',
     'api.magazine.apps.MagazineConfig',
     'api.community.apps.CommunityConfig',
     'api.firebase_push.apps.FirebasePushConfig',
@@ -56,6 +57,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.apple',
+    "django_elasticsearch_dsl",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + COMMERCE_APPS + THIRD_PARTY_APPS
@@ -77,6 +79,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 TEMPLATES = [
@@ -158,6 +161,14 @@ REST_FRAMEWORK = {
     ],
     'DATETIME_FORMAT': '%Y.%m.%d',
 }
+
+# ELASTIC SEARCH
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+
 
 # SUMMERNOTE
 SUMMERNOTE_CONFIG = {

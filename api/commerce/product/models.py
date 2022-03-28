@@ -3,6 +3,7 @@ from django.db import models
 from api.user.models import User
 from django.utils import timezone
 from api.utils import FilenameChanger
+from api.commerce.brand.models import Brand
 from api.commerce.category.models import Category
 from django.utils.translation import gettext_lazy as _
 
@@ -14,18 +15,38 @@ from django_summernote.utils import get_attachment_storage, get_attachment_uploa
 class Product(models.Model):
     name = models.CharField(verbose_name=_("상품 이름"), help_text=_("상품 이름을 입력해주세요."), max_length=255)
     slug = models.CharField(verbose_name=_("상품 슬러그"), max_length=255)
-    category = models.ForeignKey(Category, verbose_name=_('카테고리'), on_delete=models.RESTRICT)
-    description = models.TextField(
-        verbose_name=_("상품 설명"),
+    brand = models.ForeignKey(
+        Brand,
+        verbose_name=_('카테고리'),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    category = models.ForeignKey(
+        Category,
+        verbose_name=_('카테고리'),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    summary = models.TextField(
+        verbose_name=_("상품 요약"),
         help_text=_("상품에 대한 간략한 설명"),
         null=True,
         blank=True,
     )
-    specification = models.TextField(
+    description = models.TextField(
         verbose_name=_("상품 상세 설명"),
         help_text=_("상품에 대한 상세 설명"),
         null=True,
         blank=True,
+    )
+    video = models.FileField(
+        upload_to=FilenameChanger('product_video1'),
+        verbose_name=_("비디오 파일"),
+        null=True,
+        blank=True,
+        help_text='비디오 파일을 올려주세요.',
     )
     org_price = models.IntegerField(verbose_name=_("정가"),)
     discount_price = models.IntegerField(verbose_name=_("할인가"),)
