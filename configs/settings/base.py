@@ -47,6 +47,7 @@ COMMERCE_APPS = [
 # OTHER LIBRARIES
 THIRD_PARTY_APPS = [
     'storages',
+    'django_summernote',
     'rest_framework',
     'rest_framework.authtoken',
     'allauth',
@@ -157,6 +158,13 @@ REST_FRAMEWORK = {
     ],
     'DATETIME_FORMAT': '%Y.%m.%d',
 }
+
+# SUMMERNOTE
+SUMMERNOTE_CONFIG = {
+    'iframe': True,
+    'attachment_filesize_limit': 1024 * 1024 * 10  # 10MB
+}
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # COOLSMS
 COOLSMS_API_KEY = 'NCSMVIWDWDVLDXLG'
