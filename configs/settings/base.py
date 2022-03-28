@@ -57,7 +57,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.apple',
-    "django_elasticsearch_dsl",
+    'django_elasticsearch_dsl',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + COMMERCE_APPS + THIRD_PARTY_APPS

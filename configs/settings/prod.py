@@ -6,7 +6,7 @@ pymysql.install_as_MySQLdb()
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
-DB = 'pymysql'
+DB = 'sqlite'
 
 if DB == 'sqlite':
     DATABASES = {
@@ -30,7 +30,7 @@ if DB == 'mysql':
 
 
 # S3
-USE_S3 = True
+USE_S3 = False
 
 if USE_S3:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
