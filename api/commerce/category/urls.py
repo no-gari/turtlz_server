@@ -3,5 +3,5 @@ from django.urls import path
 
 
 urlpatterns = [
-    path('list/', CategoryListAPIView.as_view()),
+    path('', CategoryListAPIView.as_view()),
 ]
