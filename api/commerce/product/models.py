@@ -41,6 +41,13 @@ class Product(models.Model):
         null=True,
         blank=True,
     )
+    banner_img = models.ImageField(
+        upload_to=FilenameChanger('product_banner_image'),
+        verbose_name=_("배너 이미지"),
+        blank=True,
+        null=True,
+        help_text='배너 이미지를 올려 주세요.'
+    )
     video = models.FileField(
         upload_to=FilenameChanger('product_video1'),
         verbose_name=_("비디오 파일"),
