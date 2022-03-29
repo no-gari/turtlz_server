@@ -82,6 +82,7 @@ class Product(models.Model):
         blank=True,
         verbose_name=_("상품 위시리스트"),
     )
+    hits = models.IntegerField(verbose_name=_("조회수"), default=0)
 
     def save(self, *args, **kwargs):
         hash_string = hashlib.sha1(str(timezone.now()).encode('utf-8')).hexdigest()

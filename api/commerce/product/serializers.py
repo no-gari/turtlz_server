@@ -22,7 +22,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'org_price', 'discount_price', 'is_like']
+        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'video',
+                            'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
 
     def get_is_like(self, obj):
         user = self.context['request'].user
@@ -30,3 +31,31 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             return user in obj.like_users.all()
         else:
             return False
+
+    def update(self, instance):
+        instance.hits += 1
+        instance.save()
+        return instance
+
+
+class ProductLikeSerializer(serializers.ModelSerializer):
+    is_like = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ['is_like']
+
+    def get_is_like(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return user in obj.like_user_set.all()
+        else:
+            return False
+
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        if user in instance.like_user_set.all():
+            instance.like_user_set.remove(user)
+        else:
+            instance.like_user_set.add(user)
+        return instance
