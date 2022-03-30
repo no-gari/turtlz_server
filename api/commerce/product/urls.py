@@ -4,6 +4,7 @@ from api.commerce.product.views import ProductListView, ProductDetailView, Produ
 
 urlpatterns = [
     path('', ProductListView.as_view()),
-    path('<int:id>/', ProductDetailView.as_view()),
-    path('<int:id>/like/', ProductLikeView.as_view()),
+    path('<str:slug>/', ProductDetailView.as_view()),
+    path('<str:slug>/like/', ProductLikeView.as_view()),
+    path('product-options/<str:slug>/', )
 ]

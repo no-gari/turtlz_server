@@ -32,10 +32,11 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         else:
             return False
 
-    def update(self, instance):
-        instance.hits += 1
-        instance.save()
-        return instance
+
+class ProductVariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        read_only_fields = ['slug', 'name', 'restrict_quantity', 'quantity']
 
 
 class ProductLikeSerializer(serializers.ModelSerializer):
