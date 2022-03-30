@@ -4,7 +4,7 @@ from api.commerce.product.models import Product, ProductVariant
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
 from api.commerce.product.serializers import ProductListSerializer, ProductDetailSerializer, \
-    ProductLikeSerializer, ProductVariantSerializer
+    ProductLikeSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -24,18 +24,9 @@ class ProductListView(ListAPIView):
 class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductDetailSerializer
     permission_classes = [AllowAny]
-    lookup_field = 'slug'
 
     def get_object(self):
-        return Product.objects.get(slug=self.kwargs['slug'])
-
-
-class ProductVariantView(RetrieveAPIView):
-    serializer_class = ProductVariantSerializer
-    pagination_class = None
-
-    def get_queryset(self):
-        return ProductVariant.objects.filter(product_option__slug=self.kwargs['slug'])
+        return Product.objects.get(slug=self.kwargs['slug']).prefetch_related('wish_product')
 
 
 class ProductLikeView(UpdateAPIView):

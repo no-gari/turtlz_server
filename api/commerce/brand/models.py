@@ -22,7 +22,11 @@ class Brand(models.Model):
         null=True,
         blank=True,
     )
-    slug = models.CharField(verbose_name=_("브랜드 슬러그"), max_length=255)
+    slug = models.CharField(
+        verbose_name=_("브랜드 슬러그"),
+        help_text=_("슬러그는 자동으로 생성됩니다."),
+        max_length=255
+    )
     name = models.CharField(verbose_name=_("브랜드 이름"), help_text=_("브랜드 이름을 입력해주세요."), max_length=255)
     brand_banner = models.ImageField(
         verbose_name=_("브랜드 배너 이미지"),
@@ -30,7 +34,7 @@ class Brand(models.Model):
         null=True,
         blank=True,
     )
-    thumnail_image = models.ImageField(
+    thumbnail_image = models.ImageField(
         verbose_name=_("브랜드 썸네일 이미지"),
         upload_to=FilenameChanger('brand_thumbnail'),
         null=True,

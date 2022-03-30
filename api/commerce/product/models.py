@@ -17,7 +17,8 @@ class Product(models.Model):
     slug = models.CharField(verbose_name=_("상품 슬러그"), max_length=255)
     brand = models.ForeignKey(
         Brand,
-        verbose_name=_('카테고리'),
+        verbose_name=_('브랜드'),
+        help_text=_('생성하는 상품이 해당하는 브랜드를 선택해 주세요.'),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -25,35 +26,36 @@ class Product(models.Model):
     category = models.ForeignKey(
         Category,
         verbose_name=_('카테고리'),
+        help_text=_("가장 하위의 카테고리 하나만 골라주세요."),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     summary = models.TextField(
         verbose_name=_("상품 요약"),
-        help_text=_("상품에 대한 간략한 설명"),
+        help_text=_("상품에 대한 간략한 설명을 적어주세요."),
         null=True,
         blank=True,
     )
     description = models.TextField(
         verbose_name=_("상품 상세 설명"),
-        help_text=_("상품에 대한 상세 설명"),
+        help_text=_("상품에 대한 상세 설명을 적어주세요."),
         null=True,
         blank=True,
     )
     banner_img = models.ImageField(
         upload_to=FilenameChanger('product_banner_image'),
         verbose_name=_("배너 이미지"),
+        help_text='배너 이미지를 올려 주세요.',
         blank=True,
         null=True,
-        help_text='배너 이미지를 올려 주세요.'
     )
     video = models.FileField(
         upload_to=FilenameChanger('product_video1'),
         verbose_name=_("비디오 파일"),
+        help_text='비디오 파일을 올려주세요.',
         null=True,
         blank=True,
-        help_text='비디오 파일을 올려주세요.',
     )
     org_price = models.IntegerField(verbose_name=_("정가"),)
     discount_price = models.IntegerField(verbose_name=_("할인가"),)
@@ -100,11 +102,15 @@ class Product(models.Model):
 class ProductVariant(models.Model):
     product_option = models.ForeignKey(
         Product,
-        verbose_name=_("옵션 이름"),
+        verbose_name=_("상품 옵션"),
         related_name="product_option",
         on_delete=models.CASCADE
     )
-    slug = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    slug = models.CharField(
+        max_length=255,
+        verbose_name=_("상품 슬러그"),
+        help_text=_('슬러그는 자동으로 생성됩니다.'),
+        unique=True, null=True, blank=True)
     name = models.CharField(
         max_length=255,
         verbose_name=_("옵션 이름"),

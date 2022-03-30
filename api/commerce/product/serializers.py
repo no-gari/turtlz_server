@@ -17,13 +17,25 @@ class ProductListSerializer(serializers.ModelSerializer):
             return False
 
 
+class ProductOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        read_only_fields = ['slug', 'name', 'restrict_quantity', 'quantity']
+
+
 class ProductDetailSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField(read_only=True)
+    product_option = ProductOptionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'video',
-                            'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
+        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_option',
+                            'video', 'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['product_option'] = ProductOptionSerializer(instance.product_option).data
+        return response
 
     def get_is_like(self, obj):
         user = self.context['request'].user
@@ -31,12 +43,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             return user in obj.like_users.all()
         else:
             return False
-
-
-class ProductVariantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductVariant
-        read_only_fields = ['slug', 'name', 'restrict_quantity', 'quantity']
 
 
 class ProductLikeSerializer(serializers.ModelSerializer):

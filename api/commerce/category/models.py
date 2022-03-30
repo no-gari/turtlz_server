@@ -15,7 +15,13 @@ class Category(models.Model):
         null=True,
         blank=True
     )
-    slug = models.CharField(verbose_name=_("카테고리 슬러그"), max_length=255, null=True, blank=True)
+    slug = models.CharField(
+        verbose_name=_("카테고리 슬러그"),
+        help_text=_('슬러그는 자동으로 생성됩니다.'),
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
     def save(self, *args, **kwargs):
         hash_string = hashlib.sha1(str(timezone.now()).encode('utf-8')).hexdigest()
