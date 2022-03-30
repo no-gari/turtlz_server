@@ -1,10 +1,11 @@
+from api.commerce.product.models import Product
+from rest_framework.filters import OrderingFilter
+from django_filters import rest_framework as filters
 from rest_framework.pagination import PageNumberPagination
 from api.commerce.product.filtersets import ProductFilterSet
-from api.commerce.product.models import Product, ProductVariant
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
-from api.commerce.product.serializers import ProductListSerializer, ProductDetailSerializer, \
-    ProductLikeSerializer
+from api.commerce.product.serializers import ProductListSerializer, ProductDetailSerializer, ProductLikeSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -14,10 +15,12 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class ProductListView(ListAPIView):
-    queryset = Product.objects.prefetch_related('wish_product').all()
+    queryset = Product.objects.prefetch_related('wish_product').filter(is_active=True)
     pagination_class = StandardResultsSetPagination
     serializer_class = ProductListSerializer
     filter_class = ProductFilterSet
+    filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['hits', 'discount_price']
     permission_classes = [AllowAny]
 
 
@@ -26,10 +29,11 @@ class ProductDetailView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
     def get_object(self):
-        return Product.objects.get(slug=self.kwargs['slug']).prefetch_related('wish_product')
+        return Product.objects.prefetch_related('wish_product').get(slug=self.kwargs['slug'])
 
 
 class ProductLikeView(UpdateAPIView):
     queryset = Product.objects.prefetch_related('wish_product').all()
     serializer_class = ProductLikeSerializer
     permission_classes = [IsAuthenticated]
+    allowed_methods = ['put']

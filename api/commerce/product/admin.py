@@ -39,7 +39,8 @@ class ProductVariantAdmin(admin.ModelAdmin):
 @admin.register(models.Product)
 class ProductAdmin(SummernoteModelAdmin):
     form = ProductAdminForm
-    search_fields = ('name',)
+    search_fields = ['name']
+    readonly_fields = ['slug', 'hits']
     summernote_fields = ('description',)
 
     def get_form(self, request, obj=None, change=False, **kwargs):

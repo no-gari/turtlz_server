@@ -9,7 +9,9 @@ ALLOWED_HOSTS = ['*.ap-northeast-2.elasticbeanstalk.com']
 
 # BASE DJANGO APPS
 DJANGO_APPS = [
+    # DJANGO ADMIN CUSTOM CSS
     'admin_menu',
+    # DJANGO DEFAULT APPS
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -23,7 +25,7 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     'api.user.apps.UserConfig',
     'api.logger.apps.LoggerConfig',
-    'api.search.apps.SearchConfig',
+    # 'api.search.apps.SearchConfig',
     'api.magazine.apps.MagazineConfig',
     'api.community.apps.CommunityConfig',
     'api.firebase_push.apps.FirebasePushConfig',
@@ -47,17 +49,24 @@ COMMERCE_APPS = [
 
 # OTHER LIBRARIES
 THIRD_PARTY_APPS = [
+    # DJANGO STORAGES FOR SERVER
     'storages',
+    # DJANGO FILTER BACKEND
+    'django_filters',
+    # WYSIWYG EDITOR
     'django_summernote',
+    # DRF
     'rest_framework',
     'rest_framework.authtoken',
+    # DJANGO SOCIAL LOGIN
     'allauth',
     'dj_rest_auth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.apple',
-    'django_elasticsearch_dsl',
+    # DJANGO ELASTIC SEARRCH MODEL
+    # 'django_elasticsearch_dsl',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + COMMERCE_APPS + THIRD_PARTY_APPS

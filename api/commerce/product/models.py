@@ -14,7 +14,8 @@ from django_summernote.utils import get_attachment_storage, get_attachment_uploa
 
 class Product(models.Model):
     name = models.CharField(verbose_name=_("상품 이름"), help_text=_("상품 이름을 입력해주세요."), max_length=255)
-    slug = models.CharField(verbose_name=_("상품 슬러그"), max_length=255)
+    slug = models.CharField(
+        verbose_name=_("상품 슬러그"), help_text=_("슬러그는 자동으로 생성됩니다."), max_length=255)
     brand = models.ForeignKey(
         Brand,
         verbose_name=_('브랜드'),
@@ -79,7 +80,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(_("수정 일자"), auto_now=True)
     wish_product = models.ManyToManyField(
         User,
-        related_name="user_wish_product",
+        related_name="wish_product",
         null=True,
         blank=True,
         verbose_name=_("상품 위시리스트"),
