@@ -16,11 +16,11 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 class ProductListView(ListAPIView):
     queryset = Product.objects.prefetch_related('wish_product').filter(is_active=True)
+    filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
     pagination_class = StandardResultsSetPagination
+    ordering_fields = ['hits', 'discount_price']
     serializer_class = ProductListSerializer
     filter_class = ProductFilterSet
-    filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
-    ordering_fields = ['hits', 'discount_price']
     permission_classes = [AllowAny]
 
 
