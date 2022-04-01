@@ -2,6 +2,12 @@ from api.commerce.product.models import Product, ProductVariant
 from rest_framework import serializers
 
 
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['name', 'slug', 'banner_img', 'discount_price']
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField(read_only=True)
     brand_name = serializers.CharField(read_only=True, source="brand.name")

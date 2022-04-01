@@ -7,10 +7,6 @@ from api.commerce.brand.models import Brand
 from api.commerce.category.models import Category
 from django.utils.translation import gettext_lazy as _
 
-# DJANGO-SUMMERNOTE (WYSIWYG EDITOR)
-from django_summernote import models as summermodel
-from django_summernote.utils import get_attachment_storage, get_attachment_upload_to
-
 
 class Product(models.Model):
     name = models.CharField(verbose_name=_("상품 이름"), help_text=_("상품 이름을 입력해주세요."), max_length=255)
@@ -143,47 +139,3 @@ class ProductVariant(models.Model):
     class Meta:
         verbose_name = _("옵션 종류")
         verbose_name_plural = _(verbose_name)
-
-
-# SUMMERNOTE RELATED MODELS
-class Files(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='매거진')
-    file = models.FileField(upload_to=FilenameChanger('product_spec'), verbose_name='첨부 자료')
-    org_file_name = models.CharField(max_length=255, blank=True, verbose_name='원본파일명')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='생성일')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='수정일')
-
-    def __str__(self):
-        return str(self.product.name) + ' 의 파일'
-
-    class Meta:
-        verbose_name = '첨부 파일'
-        verbose_name_plural = '첨부 파일'
-
-
-class Summernote(summermodel.AbstractAttachment):
-    product = summermodel.models.ForeignKey(
-        Product,
-        null=True,
-        blank=True,
-        verbose_name='상품',
-        on_delete=models.CASCADE,
-    )
-    name = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True,
-        verbose_name='원본파일명',
-    )
-    file = models.FileField(
-        upload_to=get_attachment_upload_to(),
-        storage=get_attachment_storage(),
-        unique=True,
-    )
-
-    def __str__(self):
-        return str(self.name)
-
-    class Meta:
-        verbose_name = '첨부 이미지'
-        verbose_name_plural = '첨부 이미지'

@@ -12,10 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='cartitem',
-            name='product',
-        ),
         migrations.AddField(
             model_name='cartitem',
             name='product_variant',

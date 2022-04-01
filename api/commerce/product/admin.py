@@ -1,5 +1,4 @@
 from django_summernote.admin import SummernoteModelAdmin
-from django.utils.safestring import mark_safe
 from api.commerce.product import models
 from django.contrib import admin
 from django import forms
@@ -47,46 +46,3 @@ class ProductAdmin(SummernoteModelAdmin):
         form = super().get_form(request, obj, change, **kwargs)
         form.request = request
         return form
-
-
-@admin.register(models.Files)
-class FilesAdmin(admin.ModelAdmin):
-    list_display = ('product', 'file', 'org_file_name', 'created_at', 'updated_at',)
-    list_display_links = ('product',)
-    list_filter = ['product']
-    search_fields = ('org_file_name',)
-    readonly_fields = ['file_image_small']
-    autocomplete_fields = ['product']
-
-    def file_image_small(self, obj):
-        if obj.org_file_name != '':
-            file_ext = obj.org_file_name.split('.')[1]
-            if file_ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp']:
-                return mark_safe('<img src="{url}" height="100" />'.format(url=obj.file.url))
-            else:
-                return mark_safe('this is not image')
-
-    file_image_small.short_description = '이미지'
-
-
-@admin.register(models.Summernote)
-class SummernoteAdmin(admin.ModelAdmin):
-    list_display = ('get_id', 'product', 'name', 'file', 'uploaded',)
-    list_display_links = ('product', 'name',)
-    readonly_fields = ['product', 'name', 'file_image_small']
-    autocomplete_fields = ['product']
-
-    def get_id(self, obj):
-        return obj.id
-
-    get_id.short_description = 'ID'
-
-    def file_image_small(self, obj):
-        if obj.name != '':
-            file_ext = obj.name.split('.')[1]
-            if file_ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp']:
-                return mark_safe('<img src="{url}" height="100" />'.format(url=obj.file.url))
-            else:
-                return mark_safe('this is not image')
-
-    file_image_small.short_description = '이미지'

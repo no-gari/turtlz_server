@@ -1,12 +1,12 @@
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
-from api.commerce.cart.serializers import CartItemSerializer, CartSerializer
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
+from api.commerce.cart.serializers import CartItemSerializer, CartSerializer, CartItemCreateSerializer
 from rest_framework.permissions import IsAuthenticated
 from api.commerce.cart.models import Cart
 
 
 class CreateCartItemView(CreateAPIView):
+    serializer_class = CartItemCreateSerializer
     permission_classes = [IsAuthenticated]
-    serializer_class = CartItemSerializer
 
 
 class CartRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):

@@ -41,7 +41,7 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(verbose_name=_('수량'))
 
     def __str__(self):
-        return self.product.name + ' : ' + str(self.quantity)
+        return self.product_variant.product.name + '/ 옵션 : ' + self.product_variant.name
 
     class Meta:
         verbose_name = _("카트 아이템")
