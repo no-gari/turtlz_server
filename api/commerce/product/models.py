@@ -101,11 +101,12 @@ class Product(models.Model):
 
 
 class ProductVariant(models.Model):
-    product_option = models.ForeignKey(
+    product = models.ForeignKey(
         Product,
-        verbose_name=_("상품 옵션"),
-        related_name="product_option",
-        on_delete=models.CASCADE
+        verbose_name=_("상품"),
+        related_name="product_variant",
+        on_delete=models.CASCADE,
+        null=True,
     )
     slug = models.CharField(
         max_length=255,

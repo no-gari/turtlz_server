@@ -1,6 +1,6 @@
 from django.db import models
 from api.user.models import User
-from api.commerce.product.models import Product
+from api.commerce.product.models import ProductVariant
 from django.utils.translation import gettext_lazy as _
 
 
@@ -27,13 +27,16 @@ class Cart(models.Model):
 class CartItem(models.Model):
     cart = models.ForeignKey(
         Cart,
+        related_name="cart_item_set",
         verbose_name=_('장바구니'),
         on_delete=models.CASCADE,
     )
-    product = models.ForeignKey(
-        Product,
-        verbose_name=_('상품'),
-        on_delete=models.CASCADE,
+    product_variant = models.ForeignKey(
+        ProductVariant,
+        verbose_name=_('상품 옵션'),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     quantity = models.PositiveIntegerField(verbose_name=_('수량'))
 

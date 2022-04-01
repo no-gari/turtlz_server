@@ -19,7 +19,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             return False
 
 
-class ProductOptionSerializer(serializers.ModelSerializer):
+class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
         fields = ['slug', 'name', 'restrict_quantity', 'quantity']
@@ -28,13 +28,13 @@ class ProductOptionSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField(read_only=True)
-    product_option = ProductOptionSerializer(many=True)
+    product_variant = ProductVariantSerializer(many=True)
 
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_option', 'video',
+        fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_variant', 'video',
                   'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
-        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_option',
+        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_variant',
                             'video', 'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
 
     def get_is_like(self, obj):
