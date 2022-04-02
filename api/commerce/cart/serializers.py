@@ -5,9 +5,6 @@ from api.commerce.product.serializers import SimpleProductSerializer
 
 
 # 카트에 상품 추가를 위해 variant, quantity 만 받는다.
-from api.commerce.product.models import Product
-
-
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
@@ -60,7 +57,7 @@ class CartProductSerializer(serializers.Serializer):
         fields = ['brand', 'product', 'variant_name', 'variant_slug', 'quantity']
 
 
-# Cart 화면에 띄우는 serializer. 각 브랜드마다 상품을 나눠서 보여주고, 최소 주문 금액과 배송비를 합산하여 보여준다.
+# 마지막으로 카트에 보내는 역할.
 class CartSerializer(serializers.ModelSerializer):
     cart_item_set = CartProductSerializer(many=True)
 
