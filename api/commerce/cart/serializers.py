@@ -4,7 +4,7 @@ from api.commerce.brand.serializers import SimpleBrandSerializer
 from api.commerce.product.serializers import SimpleProductSerializer
 
 
-# 카트에 상품 추가, 수정, 삭제를 위해 variant, quantity 만 받는다.
+# 카트에 상품 추가, 수정, 삭제를 위해 id, quantity 만 받는다.
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem

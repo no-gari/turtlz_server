@@ -1,9 +1,17 @@
 from django.db import models
 from api.user.models import User
+from api.commerce.brand.models import Brand
 from django.utils.translation import gettext_lazy as _
 
 
 class Coupon(models.Model):
+    brand = models.ForeignKey(
+        Brand,
+        verbose_name=_('브랜드'),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     user = models.ManyToManyField(
         User,
         through='CouponUser',
@@ -15,16 +23,6 @@ class Coupon(models.Model):
     name = models.CharField(verbose_name=_("쿠폰 이름"), help_text=_("상품 이름을 입력해주세요."), max_length=255)
     discount_price = models.IntegerField(verbose_name=_("할인 가격"),)
     expire_date = models.DateField(verbose_name=_("쿠폰 만료일자"), )
-
-    class CouponType(models.TextChoices):
-        BRAND = 'BR', _('브랜드 쿠폰')
-        CART = 'CA', _('장바구니 쿠폰')
-
-    coupon_type = models.CharField(
-        max_length=2,
-        choices=CouponType.choices,
-        default=CouponType.BRAND,
-    )
 
     def __str__(self):
         return self.name

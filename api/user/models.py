@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
+from django.utils.translation import gettext_lazy as _
 from api.utils import FilenameChanger
 from django.db import models
 
@@ -33,8 +34,8 @@ class User(AbstractUser):
     first_name = None
     last_name = None
     username = None
-    email = models.EmailField(verbose_name='이메일', unique=True)
-    phone = models.CharField(verbose_name='휴대폰', max_length=11, null=True, blank=True)
+    email = models.EmailField(verbose_name=_('이메일'), unique=True)
+    phone = models.CharField(verbose_name=_('휴대폰'), max_length=11, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -58,10 +59,11 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nickname = models.CharField(max_length=32, verbose_name='닉네임', null=True, blank=True)
-    profile_image = models.ImageField(verbose_name='프로필 사진', null=True, blank=True, upload_to=FilenameChanger('profile'))
-    created_at = models.DateTimeField(verbose_name='생성일자', auto_now_add=True, null=True, blank=True)
-    kind = models.CharField(max_length=32, verbose_name='종류', null=True, blank=True)
+    nickname = models.CharField(max_length=32, verbose_name=_('닉네임'), null=True, blank=True)
+    profile_image = models.ImageField(verbose_name=_('프로필 사진'), null=True, blank=True, upload_to=FilenameChanger('profile'))
+    created_at = models.DateTimeField(verbose_name=_('생성 일자'), auto_now_add=True, null=True, blank=True)
+    kind = models.CharField(max_length=32, verbose_name=_('종류'), null=True, blank=True)
+    points = models.PositiveIntegerField(default=0, verbose_name=_('포인트'))
 
     class Meta:
         verbose_name = '프로필'
