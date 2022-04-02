@@ -29,7 +29,7 @@ class ProductDetailView(RetrieveAPIView):
     permission_classes = [AllowAny]
 
     def get_object(self):
-        return Product.objects.prefetch_related('wish_product').get(slug=self.kwargs['slug'])
+        return Product.objects.prefetch_related('wish_product').get(id=self.kwargs['pk'])
 
 
 class ProductLikeView(UpdateAPIView):

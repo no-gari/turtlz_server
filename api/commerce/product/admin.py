@@ -39,7 +39,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
 class ProductAdmin(SummernoteModelAdmin):
     form = ProductAdminForm
     search_fields = ['name']
-    readonly_fields = ['slug', 'hits']
+    readonly_fields = ['hits']
     summernote_fields = ('description',)
 
     def get_form(self, request, obj=None, change=False, **kwargs):

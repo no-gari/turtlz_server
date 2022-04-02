@@ -5,7 +5,7 @@ from rest_framework import serializers
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'banner_img', 'discount_price']
+        fields = ['name', 'banner_img', 'discount_price']
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -14,8 +14,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'brand_name', 'banner_img', 'org_price', 'discount_price', 'is_like']
-        read_only_fields = ['name', 'slug', 'brand_name', 'banner_img', 'org_price', 'discount_price', 'is_like']
+        fields = ['name', 'brand_name', 'banner_img', 'org_price', 'discount_price', 'is_like']
+        read_only_fields = ['name', 'brand_name', 'banner_img', 'org_price', 'discount_price', 'is_like']
 
     def get_is_like(self, obj):
         user = self.context['request'].user
@@ -28,8 +28,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ['slug', 'name', 'restrict_quantity', 'quantity']
-        read_only_fields = ['slug', 'name', 'restrict_quantity', 'quantity']
+        fields = ['name', 'restrict_quantity', 'quantity']
+        read_only_fields = ['name', 'restrict_quantity', 'quantity']
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -38,9 +38,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_variant', 'video',
+        fields = ['name', 'brand', 'banner_img', 'summary', 'description', 'product_variant', 'video',
                   'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
-        read_only_fields = ['name', 'slug', 'brand', 'banner_img', 'summary', 'description', 'product_variant',
+        read_only_fields = ['name', 'brand', 'banner_img', 'summary', 'description', 'product_variant',
                             'video', 'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
 
     def get_is_like(self, obj):

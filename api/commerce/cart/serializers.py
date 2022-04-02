@@ -4,7 +4,7 @@ from api.commerce.brand.serializers import SimpleBrandSerializer
 from api.commerce.product.serializers import SimpleProductSerializer
 
 
-# 카트에 상품 추가를 위해 variant, quantity 만 받는다.
+# 카트에 상품 추가, 수정, 삭제를 위해 variant, quantity 만 받는다.
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
@@ -49,12 +49,12 @@ class CartProductSerializer(serializers.Serializer):
     brand = SimpleBrandSerializer(read_only=True, source='product_variant.product.brand')
     product = SimpleProductSerializer(read_only=True, source='product_variant.product')
     variant_name = serializers.CharField(source='product_variant.name')
-    variant_slug = serializers.CharField(source='product_variant.slug')
+    variant_id = serializers.CharField(source='product_variant.id')
     quantity = serializers.CharField()
 
     class Meta:
         model = CartItem
-        fields = ['brand', 'product', 'variant_name', 'variant_slug', 'quantity']
+        fields = ['brand', 'product', 'variant_name', 'variant_id', 'quantity']
 
 
 # 마지막으로 카트에 보내는 역할.

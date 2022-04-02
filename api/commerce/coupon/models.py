@@ -13,7 +13,6 @@ class Coupon(models.Model):
     )
     user_limit = models.PositiveIntegerField(verbose_name=_("쿠폰 최대 발급 개수"))
     name = models.CharField(verbose_name=_("쿠폰 이름"), help_text=_("상품 이름을 입력해주세요."), max_length=255)
-    slug = models.CharField(verbose_name=_("쿠폰 슬러그"), max_length=255)
     discount_price = models.IntegerField(verbose_name=_("할인 가격"),)
     expire_date = models.DateField(verbose_name=_("쿠폰 만료일자"), )
 

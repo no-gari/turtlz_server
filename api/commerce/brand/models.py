@@ -1,7 +1,5 @@
-import hashlib
 from django.db import models
 from api.user.models import User
-from django.utils import timezone
 from api.utils import FilenameChanger
 from django.utils.translation import gettext_lazy as _
 
@@ -21,11 +19,6 @@ class Brand(models.Model):
         verbose_name=_('브랜드 위시리스트'),
         null=True,
         blank=True,
-    )
-    slug = models.CharField(
-        verbose_name=_("브랜드 슬러그"),
-        help_text=_("슬러그는 자동으로 생성됩니다."),
-        max_length=255
     )
     name = models.CharField(verbose_name=_("브랜드 이름"), help_text=_("브랜드 이름을 입력해주세요."), max_length=255)
     brand_banner = models.ImageField(
@@ -53,11 +46,6 @@ class Brand(models.Model):
         null=True,
         blank=True,
     )
-
-    def save(self, *args, **kwargs):
-        hash_string = hashlib.sha1(str(timezone.now()).encode('utf-8')).hexdigest()
-        self.slug = hash_string[:8]
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

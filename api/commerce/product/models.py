@@ -1,7 +1,5 @@
-import hashlib
 from django.db import models
 from api.user.models import User
-from django.utils import timezone
 from api.utils import FilenameChanger
 from api.commerce.brand.models import Brand
 from api.commerce.category.models import Category
@@ -10,8 +8,6 @@ from django.utils.translation import gettext_lazy as _
 
 class Product(models.Model):
     name = models.CharField(verbose_name=_("상품 이름"), help_text=_("상품 이름을 입력해주세요."), max_length=255)
-    slug = models.CharField(
-        verbose_name=_("상품 슬러그"), help_text=_("슬러그는 자동으로 생성됩니다."), max_length=255)
     brand = models.ForeignKey(
         Brand,
         verbose_name=_('브랜드'),
@@ -83,11 +79,6 @@ class Product(models.Model):
     )
     hits = models.IntegerField(verbose_name=_("조회수"), default=0)
 
-    def save(self, *args, **kwargs):
-        hash_string = hashlib.sha1(str(timezone.now()).encode('utf-8')).hexdigest()
-        self.slug = hash_string[:8]
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
@@ -104,11 +95,6 @@ class ProductVariant(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    slug = models.CharField(
-        max_length=255,
-        verbose_name=_("상품 슬러그"),
-        help_text=_('슬러그는 자동으로 생성됩니다.'),
-        unique=True, null=True, blank=True)
     name = models.CharField(
         max_length=255,
         verbose_name=_("옵션 이름"),
@@ -127,11 +113,6 @@ class ProductVariant(models.Model):
     )
     created_at = models.DateTimeField(_("생성 일자"), auto_now_add=True)
     updated_at = models.DateTimeField(_("수정 일자"), auto_now=True)
-
-    def save(self, *args, **kwargs):
-        hash_string = hashlib.sha1(str(timezone.now()).encode('utf-8')).hexdigest()
-        self.slug = hash_string[:8]
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

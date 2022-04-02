@@ -6,7 +6,7 @@ class ProductFilterSet(django_filters.FilterSet):
     class Meta:
         model = Product
         fields = {
-            'brand__slug': ['exact'],
-            'category__slug': ['exact'],
+            'brand': ['exact'],
+            'category': ['exact'],
             'discount_price': ['lt', 'gt'],
         }
