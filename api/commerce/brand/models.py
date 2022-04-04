@@ -15,7 +15,7 @@ class Brand(models.Model):
     )
     wish_brand = models.ManyToManyField(
         User,
-        related_name='user_wish_brand',
+        related_name='wish_brand',
         verbose_name=_('브랜드 위시리스트'),
         null=True,
         blank=True,

@@ -31,3 +31,13 @@ class BrandLikeView(UpdateAPIView):
     serializer_class = BrandLikeSerializer
     permission_classes = [IsAuthenticated]
     allowed_methods = ['put']
+
+
+class WishListBrandView(ListAPIView):
+    serializer_class = BrandListSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        wishlist = self.request.user.wish_brand.all()
+        return wishlist

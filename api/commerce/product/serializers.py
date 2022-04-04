@@ -46,7 +46,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     def get_is_like(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return user in obj.like_users.all()
+            return user in obj.wish_product.all()
         else:
             return False
 

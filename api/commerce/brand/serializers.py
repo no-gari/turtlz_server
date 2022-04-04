@@ -1,5 +1,5 @@
-from rest_framework import serializers
 from api.commerce.brand.models import Brand
+from rest_framework import serializers
 
 
 class SimpleBrandSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class BrandRetrieveSerializer(serializers.ModelSerializer):
     def get_is_like(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return user in obj.like_users.all()
+            return user in obj.wish_brand.all()
         else:
             return False
 
@@ -40,14 +40,14 @@ class BrandLikeSerializer(serializers.ModelSerializer):
     def get_is_like(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return user in obj.like_user_set.all()
+            return user in obj.wish_brand.all()
         else:
             return False
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
-        if user in instance.like_user_set.all():
-            instance.like_user_set.remove(user)
+        if user in instance.wish_brand.all():
+            instance.wish_brand.remove(user)
         else:
-            instance.like_user_set.add(user)
+            instance.wish_brand.add(user)
         return instance
