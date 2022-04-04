@@ -5,9 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 class Address(models.Model):
     user = models.ForeignKey(User, verbose_name=_('사용자'), on_delete=models.CASCADE)
-    district = models.CharField(verbose_name=_('시/도/군'), max_length=100)
-    address1 = models.CharField(verbose_name=_('구/동'), max_length=200)
-    addresss2 = models.CharField(verbose_name=_('세부 주소'), max_length=200)
+    city = models.CharField(verbose_name=_('시/도/군'), max_length=100)
+    address = models.CharField(verbose_name=_('구/동'), max_length=200)
+    specific_address = models.CharField(verbose_name=_('세부 주소'), max_length=200)
     post_code = models.CharField(verbose_name=_('우편번호'), max_length=10)
 
     def __str__(self):
