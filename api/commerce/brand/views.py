@@ -1,7 +1,7 @@
 from api.commerce.brand.serializers import BrandRetrieveSerializer, BrandListSerializer, BrandLikeSerializer
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from api.commerce.brand.models import Brand
 
 

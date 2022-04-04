@@ -3,5 +3,5 @@ from django.contrib import admin
 
 
 @admin.register(Address)
-class AddressAdmin(admin.modelAdmin):
+class AddressAdmin(admin.ModelAdmin):
     pass
