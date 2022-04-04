@@ -13,7 +13,7 @@ class BrandRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Brand
-        fields = ['is_like', 'wish_brand', 'brand_banner', 'thumbnail_image', 'description']
+        fields = ['is_like', 'brand_banner', 'thumbnail_image', 'description']
 
     def get_is_like(self, obj):
         user = self.context['request'].user
@@ -27,7 +27,15 @@ class BrandListSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField()
 
     class Meta:
+        model = Brand
         fields = ['is_like', 'thumbnail_image', 'name']
+
+    def get_is_like(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return user in obj.wish_brand.all()
+        else:
+            return False
 
 
 class BrandLikeSerializer(serializers.ModelSerializer):
