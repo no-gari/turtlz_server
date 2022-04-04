@@ -20,7 +20,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_is_like(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return user in obj.like_users.all()
+            return user in obj.wish_product.all()
         else:
             return False
 
@@ -28,8 +28,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ['name', 'restrict_quantity', 'quantity']
-        read_only_fields = ['name', 'restrict_quantity', 'quantity']
+        fields = ['id', 'name', 'sold_out']
+        read_only_fields = ['id', 'name', 'sold_out']
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -38,10 +38,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['name', 'brand', 'banner_img', 'summary', 'description', 'product_variant', 'video',
-                  'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
-        read_only_fields = ['name', 'brand', 'banner_img', 'summary', 'description', 'product_variant',
-                            'video', 'org_price', 'discount_price', 'is_like', 'restrict_quantity', 'quantity']
+        fields = ['id', 'name', 'brand', 'banner_img', 'summary', 'description', 'product_variant', 'video',
+                  'org_price', 'discount_price', 'is_like', 'sold_out']
+        read_only_fields = ['id', 'name', 'brand', 'banner_img', 'summary', 'description', 'product_variant',
+                            'video', 'org_price', 'discount_price', 'is_like', 'sold_out']
 
     def get_is_like(self, obj):
         user = self.context['request'].user
@@ -61,14 +61,14 @@ class ProductLikeSerializer(serializers.ModelSerializer):
     def get_is_like(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return user in obj.like_user_set.all()
+            return user in obj.wish_product.all()
         else:
             return False
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
-        if user in instance.like_user_set.all():
-            instance.like_user_set.remove(user)
+        if user in instance.wish_product.all():
+            instance.wish_product.remove(user)
         else:
-            instance.like_user_set.add(user)
+            instance.wish_product.add(user)
         return instance

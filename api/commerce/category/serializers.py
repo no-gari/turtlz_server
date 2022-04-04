@@ -7,7 +7,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'parent', 'category')
+        fields = ('id', 'name', 'parent', 'category')
 
     def get_category(self, instance):
         serializer = self.__class__(instance.category, many=True)

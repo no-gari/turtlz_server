@@ -24,6 +24,16 @@ class ProductListView(ListAPIView):
     permission_classes = [AllowAny]
 
 
+class WishListProductView(ListAPIView):
+    pagination_class = StandardResultsSetPagination
+    serializer_class = ProductListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        wishlist = self.request.user.wish_product.all()
+        return wishlist
+
+
 class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductDetailSerializer
     permission_classes = [AllowAny]

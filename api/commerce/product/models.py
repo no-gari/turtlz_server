@@ -57,11 +57,6 @@ class Product(models.Model):
         help_text=_("체크 해제 시 상품이 어플리케이션에서 보이지 않습니다."),
         default=True,
     )
-    restrict_quantity = models.BooleanField(
-        verbose_name=_("상품 수량 지정하기"),
-        help_text=_("체크 시 상품의 수량을 반드시 지정해주셔야 합니다. 미체크 시 수량이 무한대로 지정됩니다."),
-        default=False,
-    )
     created_at = models.DateTimeField(_("생성 일자"), auto_now_add=True)
     updated_at = models.DateTimeField(_("수정 일자"), auto_now=True)
     wish_product = models.ManyToManyField(
