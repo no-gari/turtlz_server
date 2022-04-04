@@ -1,10 +1,8 @@
-from api.commerce.cart.views import CartRetrieveView, CreateCartItemView, DestroyCartItemView, UpdateCartItemView
+from api.commerce.cart.views import CartItemListCreateView, CartItemRetrieveUpdateDestroyView
 from django.urls import path
 
 
 urlpatterns = [
-    path('', CartRetrieveView.as_view()),
-    path('add/', CreateCartItemView.as_view()),
-    path('update/', UpdateCartItemView.as_view()),
-    path('destroy/', DestroyCartItemView.as_view()),
+    path('', CartItemListCreateView.as_view()),
+    path('update/', CartItemRetrieveUpdateDestroyView.as_view()),
 ]

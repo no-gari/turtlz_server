@@ -1,33 +1,20 @@
-from rest_framework.generics import UpdateAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView
-from api.commerce.cart.serializers import CartSerializer, CartItemCreateSerializer, CartItemSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from api.commerce.cart.serializers import CartItemSerializer
 from rest_framework.permissions import IsAuthenticated
-from api.commerce.cart.models import Cart, CartItem
+from api.commerce.cart.models import CartItem
 
 
-class CreateCartItemView(CreateAPIView):
-    serializer_class = CartItemCreateSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class UpdateCartItemView(UpdateAPIView):
+class CartItemRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.select_related('user').all()
-    allowed_methods = ['put']
-
-
-class DestroyCartItemView(DestroyAPIView):
-    serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.select_related('user').all()
-    allowed_methods = ['destroy']
-
-
-class CartRetrieveView(RetrieveAPIView):
-    serializer_class = CartSerializer
-    pagination_class = None
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        cart, created = Cart.objects.prefetch_related('cart_item_set').get_or_create(user=self.request.user)
-        return cart
+        cart_item = CartItem.objects.all()
+        return cart_item
+
+
+class CartItemListCreateView(ListCreateAPIView):
+    serializer_class = CartItemSerializer
+    pagination_class = None
+    permission_classes = [IsAuthenticated]
+    queryset = CartItem.objects.all()
