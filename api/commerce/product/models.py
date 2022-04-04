@@ -62,12 +62,6 @@ class Product(models.Model):
         help_text=_("체크 시 상품의 수량을 반드시 지정해주셔야 합니다. 미체크 시 수량이 무한대로 지정됩니다."),
         default=False,
     )
-    quantity = models.IntegerField(
-        verbose_name=_("상품 수량"),
-        help_text=_("상품 수량을 입력해주세요. 수량을 제한하지 않으실 거라면 생략하셔도 됩니다."),
-        null=True,
-        blank=True,
-    )
     created_at = models.DateTimeField(_("생성 일자"), auto_now_add=True)
     updated_at = models.DateTimeField(_("수정 일자"), auto_now=True)
     wish_product = models.ManyToManyField(
@@ -78,6 +72,11 @@ class Product(models.Model):
         verbose_name=_("상품 위시리스트"),
     )
     hits = models.IntegerField(verbose_name=_("조회수"), default=0)
+    sold_out = models.BooleanField(
+        verbose_name=_('품절 여부'),
+        help_text=_('품절일 경우 체크를 해 주세요.'),
+        default=False,
+    )
 
     def __str__(self):
         return self.name
@@ -105,11 +104,10 @@ class ProductVariant(models.Model):
         help_text=_("체크 시 옵션의 수량을 반드시 지정해주셔야 합니다. 미체크 시 수량이 무한대로 지정됩니다."),
         default=False,
     )
-    quantity = models.IntegerField(
-        verbose_name=_("옵셜 별 수량"),
-        help_text=_("옵션 수량을 입력해주세요. 수량을 제한하지 않으실 거라면 생략하셔도 됩니다."),
-        null=True,
-        blank=True,
+    sold_out = models.BooleanField(
+        verbose_name=_('품절 여부'),
+        help_text=_('품절일 경우 체크를 해 주세요.'),
+        default=False,
     )
     created_at = models.DateTimeField(_("생성 일자"), auto_now_add=True)
     updated_at = models.DateTimeField(_("수정 일자"), auto_now=True)

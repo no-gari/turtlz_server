@@ -12,17 +12,18 @@ class CreateCartItemView(CreateAPIView):
 class UpdateCartItemView(UpdateAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.all()
+    queryset = CartItem.objects.select_related('user').all()
     allowed_methods = ['put']
 
 
 class DestroyCartItemView(DestroyAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.all()
+    queryset = CartItem.objects.select_related('user').all()
+    allowed_methods = ['destroy']
 
 
-class CartRetrieveUpdateDestroyView(RetrieveAPIView):
+class CartRetrieveView(RetrieveAPIView):
     serializer_class = CartSerializer
     pagination_class = None
     permission_classes = [IsAuthenticated]

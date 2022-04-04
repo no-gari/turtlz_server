@@ -44,7 +44,6 @@ COMMERCE_APPS = [
     'api.commerce.address.apps.AddressConfig',
     'api.commerce.category.apps.CategoryConfig',
     'api.commerce.checkout.apps.CheckoutConfig',
-    'api.commerce.order_item.apps.OrderItemConfig',
 ]
 
 # OTHER LIBRARIES

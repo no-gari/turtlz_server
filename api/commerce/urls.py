@@ -12,5 +12,4 @@ urlpatterns = [
     path('address/', include('api.commerce.address.urls')),
     path('category/', include('api.commerce.category.urls')),
     path('checkout/', include('api.commerce.checkout.urls')),
-    path('order_item/', include('api.commerce.order_item.urls')),
 ]
