@@ -6,17 +6,6 @@ from django.db import models
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    order_status = models.CharField(
-        choices=(
-            ('결제 완료', '결제 완료'),
-            ('배송 중', '배송 중'),
-            ('배송 완료', '배송 완료'),
-            ('취소', '취소'),
-        ),
-        default='결제 완료',
-        max_length=32,
-        verbose_name=_("주문 상태")
-    )
     order_number = models.CharField(
         max_length=64,
         verbose_name=_('주문번호')
@@ -49,9 +38,22 @@ class OrderItem(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+    order_status = models.CharField(
+        choices=(
+            ('결제 완료', '결제 완료'),
+            ('배송 중', '배송 중'),
+            ('배송 완료', '배송 완료'),
+            ('취소', '취소'),
+        ),
+        default='결제 완료',
+        max_length=32,
+        verbose_name=_("주문 상태")
+    )
     quantity = models.PositiveIntegerField(verbose_name=_('수량'))
     spent_price = models.PositiveIntegerField(verbose_name=_('상품 지불 금액'))
     discount_price = models.PositiveIntegerField(verbose_name=_('상품 할인 금액'))
+    able_to_write = models.BooleanField(verbose_name=_('리뷰 작성 가능 여부'), default=False)
+    review_written = models.BooleanField(verbose_name=_('리뷰 작성 여부'), default=False)
 
     def __str__(self):
         return self.product_variant.product.name + '/ 옵션 : ' + self.product_variant.name
