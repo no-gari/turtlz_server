@@ -12,7 +12,11 @@ class Coupon(models.Model):
         null=True,
         blank=True,
     )
-    coupon_limit = models.PositiveIntegerField(verbose_name=_('쿠폰 최대 발급 개수'), null=True, blank=True)
+    coupon_limit = models.PositiveIntegerField(
+        verbose_name=_('쿠폰 최대 발급 개수'),
+        help_text=_('수량 제한이 없다면 비어주세요.'),
+        null=True,
+        blank=True)
     name = models.CharField(
         verbose_name=_('쿠폰 이름'),
         help_text=_('쿠폰 이름을 입력해주세요.'),
