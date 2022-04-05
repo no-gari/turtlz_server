@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 from api.commerce.coupon.models import Coupon, CouponUser
 
 
@@ -10,14 +11,23 @@ class CouponSerializer(serializers.ModelSerializer):
 
 
 class CouponUserSerializer(serializers.ModelSerializer):
-    coupon = CouponSerializer(source='coupon')
+    coupon = CouponSerializer()
 
     class Meta:
         model = CouponUser
         fields = ['coupon', 'used']
 
+
+class CouponUserCreateSerializer(serializers.Serializer):
+    coupon = serializers.CharField(write_only=True)
+
     def create(self, validated_data):
-        coupon = validated_data['coupon']
-        coupon_user = self.Meta.model.objects.create(user=self.context['request'].user, coupon_id=coupon['id'])
+        coupon_user = CouponUser.objects.create(user=self.context['request'].user, coupon_id=validated_data['coupon'])
         coupon_user.save()
         return coupon_user
+
+    def validate(self, obj):
+        coupon = Coupon.objects.get(id=obj['coupon'])
+        if coupon.coupon_limit is not None and coupon.coupon_limit == 0:
+            raise ValidationError({'error': '이미 소진된 쿠폰입니다.'})
+        return super().validate(obj)

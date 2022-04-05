@@ -29,7 +29,7 @@ class Coupon(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = _('브랜드')
+        verbose_name = _('쿠폰')
         verbose_name_plural = _(verbose_name)
 
 
