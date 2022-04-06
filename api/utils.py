@@ -1,3 +1,4 @@
+from rest_framework.pagination import PageNumberPagination
 from django.utils.deconstruct import deconstructible
 import datetime
 import uuid
@@ -17,3 +18,9 @@ class FilenameChanger(object):
 
     def __eq__(self, other):
         return self.base_path
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+    page_size = 10

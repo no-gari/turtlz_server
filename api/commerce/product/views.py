@@ -6,12 +6,7 @@ from api.commerce.product.filtersets import ProductFilterSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
 from api.commerce.product.serializers import ProductListSerializer, ProductDetailSerializer, ProductLikeSerializer
-
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-    page_size = 10
+from api.utils import StandardResultsSetPagination
 
 
 class ProductListView(ListAPIView):

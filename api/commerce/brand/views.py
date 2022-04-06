@@ -1,14 +1,8 @@
 from api.commerce.brand.serializers import BrandRetrieveSerializer, BrandListSerializer, BrandLikeSerializer
 from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.pagination import PageNumberPagination
+from api.utils import StandardResultsSetPagination
 from api.commerce.brand.models import Brand
-
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-    page_size = 10
 
 
 class BrandListView(ListAPIView):
