@@ -4,6 +4,19 @@ from api.user.models import User
 from django.db import models
 
 
+class ShippingCompany(models.Model):
+    slug = models.CharField(max_length=64, verbose_name=_('배송회사 슬러그'))
+    name = models.CharField(max_length=64, verbose_name=_('배송회사 아이디'))
+    tel = models.CharField(max_length=64, verbose_name=_('회사 전화번호'))
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('배송회사')
+        verbose_name_plural = _(verbose_name)
+
+
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_number = models.CharField(
@@ -13,6 +26,8 @@ class Order(models.Model):
     shipping_address = models.CharField(
         max_length=2056,
         verbose_name=_('배송지'),
+        null=True,
+        blank=True,
     )
     total_price = models.PositiveIntegerField(verbose_name=_('총 주문 금액'))
     total_discount_price = models.PositiveIntegerField(verbose_name=_('총 할인 금액'))
@@ -48,6 +63,19 @@ class OrderItem(models.Model):
         default='결제 완료',
         max_length=32,
         verbose_name=_("주문 상태")
+    )
+    shipping_number = models.CharField(
+        max_length=128,
+        verbose_name=_("송장 번호"),
+        null=True,
+        blank=True,
+    )
+    shipping_company = models.ForeignKey(
+        ShippingCompany,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_('배송 회사'),
     )
     quantity = models.PositiveIntegerField(verbose_name=_('수량'))
     spent_price = models.PositiveIntegerField(verbose_name=_('상품 지불 금액'))
