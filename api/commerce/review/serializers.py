@@ -1,5 +1,6 @@
 from api.commerce.review.models import Reviews
 from rest_framework import serializers
+from api.commerce.order.serializers import OrderItemSerializer
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -11,7 +12,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         review = self.Meta.model.objects.create(
             user=user,
-            # order_item_id=validated_data['order_item'],
+            order_item_id=validated_data['order_item'],
             rates=validated_data['rates'],
             title=validated_data['title'],
             body=validated_data['body'],

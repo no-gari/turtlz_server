@@ -5,7 +5,7 @@ from rest_framework import serializers
 class SimpleBrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ['name', 'least_price', 'shipping_price']
+        fields = ['id', 'name', 'least_price', 'shipping_price']
 
 
 class BrandRetrieveSerializer(serializers.ModelSerializer):

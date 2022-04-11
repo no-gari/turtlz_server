@@ -2,6 +2,9 @@ from api.commerce.cart.serializers import CartItemSerializer, CartItemCreateSeri
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from api.commerce.cart.models import CartItem
+from rest_framework.response import Response
+from rest_framework import status
+from json import loads, dumps
 
 
 class CartItemRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
@@ -28,3 +31,13 @@ class CartItemListView(ListAPIView):
 
     def get_queryset(self):
         return CartItem.objects.select_related('user').filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        instance = self.get_queryset()
+        serialized_cart_products = loads(dumps(self.get_serializer(instance, many=True).data))
+        newdict = dict()
+        for data in serialized_cart_products:
+            if (newdict.get(data['brand']['id'])) is None:
+                newdict[data['brand']['id']] = list()
+                newdict[data['brand']['id']].append(data['product'])
+        return Response(newdict, status=status.HTTP_200_OK)
