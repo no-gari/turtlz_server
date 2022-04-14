@@ -10,6 +10,9 @@ class CouponListView(ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
+        brand_id = self.request.POST.get('id')
+        if brand_id == '':
+            return Coupon.objects.all()
         return Coupon.objects.filter(brand_id=self.request.POST['id'])
 
 
