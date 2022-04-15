@@ -26,7 +26,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
 
 
-def new_list(datas):
+def list_converter(datas):
     new_product_list = []
     for data in datas:
         index = next((index for (index, d) in enumerate(new_product_list) if d.get('id') == data['brand_id']), None)

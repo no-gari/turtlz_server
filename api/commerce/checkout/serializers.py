@@ -22,12 +22,11 @@ class CheckoutSerializer(serializers.Serializer):
             data['brand_{key}'.format(key=key)] = value
         return data
 
-    def get_variant_name(self, instance):
-        return instance.name
+    def get_variant_name(self, obj):
+        return obj.name
 
-    def get_variant_id(self, instance):
-        return instance.id
+    def get_variant_id(self, obj):
+        return obj.id
 
     def get_quantity(self, obj):
-        a=1
-        return obj['quantity']
+        return next(item['quantity'] for item in self.context['request'].data['check_out_items'] if item["product_variant"] == obj.id)

@@ -3,8 +3,8 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, C
 from rest_framework.permissions import IsAuthenticated
 from api.commerce.cart.models import CartItem
 from rest_framework.response import Response
+from api.utils import list_converter
 from rest_framework import status
-from api.utils import new_list
 from json import loads, dumps
 
 
@@ -36,5 +36,5 @@ class CartItemListView(ListAPIView):
     def list(self, request, *args, **kwargs):
         instance = self.get_queryset()
         cart_products = loads(dumps(self.get_serializer(instance, many=True).data))
-        product_list = new_list(cart_products)
+        product_list = list_converter(cart_products)
         return Response(product_list, status=status.HTTP_200_OK)
