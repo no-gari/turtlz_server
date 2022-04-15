@@ -65,10 +65,7 @@ class CartProductSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        # product = data.pop('product', None)
         brand = data.pop('brand', None)
-        # for key, value in product.items():
-        #     data['product_{key}'.format(key=key)] = value
         for key, value in brand.items():
             data['brand_{key}'.format(key=key)] = value
         return data

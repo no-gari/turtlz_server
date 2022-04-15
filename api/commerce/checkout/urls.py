@@ -1,6 +1,6 @@
 from django.urls import path
-from api.commerce.checkout.views import CheckoutRetrieveView
+from api.commerce.checkout.views import CheckoutView
 
 urlpatterns = [
-    path('', CheckoutRetrieveView.as_view()),
+    path('', CheckoutView.as_view()),
 ]
