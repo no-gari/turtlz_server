@@ -12,6 +12,7 @@ DJANGO_APPS = [
     # DJANGO ADMIN CUSTOM CSS
     'admin_menu',
     # DJANGO DEFAULT APPS
+    'admin_volt.apps.AdminVoltConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
