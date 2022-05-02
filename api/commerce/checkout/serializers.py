@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from api.commerce.product.models import ProductVariant
+from api.commerce. checkout.models import ShippingRequest
 from api.commerce.brand.serializers import SimpleBrandSerializer
 from api.commerce.product.serializers import SimpleProductSerializer
 
@@ -30,3 +31,9 @@ class CheckoutSerializer(serializers.Serializer):
 
     def get_quantity(self, obj):
         return next(item['quantity'] for item in self.context['request'].data['check_out_items'] if item["product_variant"] == obj.id)
+
+
+class ShippingrRequestSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingRequest
+        fields = '__all__'

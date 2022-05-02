@@ -25,4 +25,8 @@ class OrderListView(ListAPIView):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return Order.objects.select_related('user').filter(user=self.request.user)
+        return Order.objects.prefetch_related('user').filter(user=self.request.user)
+
+
+class GiftCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]

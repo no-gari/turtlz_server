@@ -1,9 +1,25 @@
+from api.user.models import User
 from django.db import models
 
 
 class LogStatus(models.TextChoices):
     SUCCESS = 'S', '성공'
     FAILED = 'F', '실패'
+
+
+class PointLog(models.Model):
+    user = models.ForeignKey(User, verbose_name='사용자', on_delete=models.CASCADE)
+    add = models.BooleanField(verbose_name='적립 / 사용 여부', default=True)
+    amount = models.PositiveIntegerField(verbose_name='적립 / 사용 금액')
+    created = models.DateTimeField('적립 / 사용 일시', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '포인트 로그'
+        verbose_name_plural = verbose_name
+        ordering = ['-created']
+
+    def __str__(self):
+        return self.user.username + ' ' + str(self.amount) + '포인트 적립' if self.add is True else '포인트 사용'
 
 
 class EmailLog(models.Model):
