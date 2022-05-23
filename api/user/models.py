@@ -40,7 +40,7 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     VERIFY_FIELDS = []
-    REGISTER_FIELDS = ['phone']
+    REGISTER_FIELDS = ['email']
 
     objects = UserManager()
 
@@ -63,6 +63,7 @@ class Profile(models.Model):
     profile_image = models.ImageField(verbose_name=_('프로필 사진'), null=True, blank=True, upload_to=FilenameChanger('profile'))
     created_at = models.DateTimeField(verbose_name=_('생성 일자'), auto_now_add=True, null=True, blank=True)
     kind = models.CharField(max_length=32, verbose_name=_('종류'), null=True, blank=True)
+    code = models.CharField(max_length=1024, verbose_name=_('SNS 고유 코드'), null=True, blank=True)
     points = models.PositiveIntegerField(default=0, verbose_name=_('포인트'))
 
     class Meta:
@@ -70,7 +71,7 @@ class Profile(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.user.username + '의 프로필'
+        return self.user.email + '의 프로필'
 
 
 class SocialKindChoices(models.TextChoices):

@@ -6,7 +6,6 @@ urlpatterns = [
     path('brand/', include('api.commerce.brand.urls')),
     path('review/', include('api.commerce.review.urls')),
     path('coupon/', include('api.commerce.coupon.urls')),
-    path('payment/', include('api.commerce.payment.urls')),
     path('product/', include('api.commerce.product.urls')),
     path('invoice/', include('api.commerce.invoice.urls')),
     path('address/', include('api.commerce.address.urls')),

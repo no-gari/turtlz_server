@@ -1,5 +1,8 @@
+import os
 import datetime
+import firebase_admin
 from pathlib import Path
+from firebase_admin import credentials
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,10 +29,9 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     'api.user.apps.UserConfig',
     'api.logger.apps.LoggerConfig',
-    # 'api.search.apps.SearchConfig',
     'api.magazine.apps.MagazineConfig',
     'api.community.apps.CommunityConfig',
-    'api.firebase_push.apps.FirebasePushConfig',
+    'api.notification.apps.NotificationConfig',
 ]
 
 # COMMERCE API APPS
@@ -39,7 +41,6 @@ COMMERCE_APPS = [
     'api.commerce.brand.apps.BrandConfig',
     'api.commerce.review.apps.ReviewConfig',
     'api.commerce.coupon.apps.CouponConfig',
-    'api.commerce.payment.apps.PaymentConfig',
     'api.commerce.product.apps.ProductConfig',
     'api.commerce.invoice.apps.InvoiceConfig',
     'api.commerce.address.apps.AddressConfig',
@@ -58,13 +59,6 @@ THIRD_PARTY_APPS = [
     # DRF
     'rest_framework',
     'rest_framework.authtoken',
-    # DJANGO SOCIAL LOGIN
-    'allauth',
-    'dj_rest_auth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.kakao',
-    'allauth.socialaccount.providers.apple',
     # DJANGO ELASTIC SEARRCH MODEL
     # 'django_elasticsearch_dsl',
 ]
@@ -196,12 +190,7 @@ MAILGUN_API_KEY = "a1209bfad6ca285a9ad2e0d7c1356b80-a0cfb957-2866bfcd"
 MAILGUN_DOMAIN = "https://api.mailgun.net/v3/api.ustain.be"
 MAILGUN_FROM_EMAIL = 'sofaissofa@icloud.com'
 
-# KAKAO_LOGIN
-KAKAO_API_KEY = '834031fe8f729b4ce1c4d1865bccd63a'
-KAKAO_CLIENT_SECRET = 'ArCJdOXV5GszOyZUj6WOqliE8bJ4DfUB'
-KAKAO_LOGIN_URL = 'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${SOCIAL_REDIRECT_URL}&state=kakao'
-
-# APPLE
-APPLE_CLIENT_ID = '123'
-APPLE_CLIENT_SECRET = ''
-APPLE_LOGIN_URL = 'https://appleid.apple.com/auth/authorize?response_type=code&client_id=${APPLE_CLIENT_ID}&redirect_uri={SOCIAL_REDIRECT_URL}&state=apple'
+# FIREBASE PUSH NOTIFICATION
+cred_path = os.path.join(BASE_DIR, "serviceAccountKey.json")
+cred = credentials.Certificate(cred_path)
+firebase_admin.initialize_app(cred)

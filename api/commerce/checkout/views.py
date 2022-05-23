@@ -17,7 +17,7 @@ class CheckoutView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         product_variants = [data['product_variant'] for data in request.data['check_out_items']]
         serialized_items = loads(dumps(self.get_serializer(ProductVariant.objects.prefetch_related('product').filter(id__in=product_variants), many=True).data))
-        request = ShippingrRequestSerializers(ShippingRequest.objects.all(), many=True).data
+        shipping_request = ShippingrRequestSerializers(ShippingRequest.objects.all(), many=True).data
+        is_cart, is_gift = request.data['is_cart'], request.data['is_gift']
         product_list = list_converter(serialized_items)
-        is_cart = request.data['is_cart']
-        return Response({'isCart': is_cart, 'checkoutList': product_list, 'request': request}, status=HTTP_200_OK)
+        return Response({'isCart': is_cart, 'is_gift': is_gift, 'checkoutList': product_list, 'request': shipping_request}, status=HTTP_200_OK)

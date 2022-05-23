@@ -1,8 +1,6 @@
-import jwt
 import random
 import hashlib
 import requests
-from django.conf import settings
 from urllib.parse import urlparse
 from django.db import transaction
 from django.utils import timezone
@@ -18,36 +16,42 @@ from api.user.models import User, EmailVerifier, PhoneVerifier, SocialKindChoice
 
 
 class UserSocialLoginSerializer(serializers.Serializer):
-    code = serializers.CharField(write_only=True)
-    state = serializers.CharField(write_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
 
+    code = serializers.CharField(write_only=True)
+    email = serializers.CharField(write_only=True)
+    nickname = serializers.CharField(write_only=True)
+    social_type = serializers.CharField(write_only=True)
+    profile_image_url = serializers.CharField(write_only=True)
+
     def validate(self, attrs):
         code = attrs['code']
-        state = attrs['state']
+        email = attrs['email']
+        nickname = attrs['nickname']
+        social_type = attrs['social_type']
+        profile_image_url = attrs['profile_image_url']
 
-        if state in SocialKindChoices:
-            attrs['social_user_attributes'] = self.get_social_user_id(code, state)
-        else:
+        if social_type not in SocialKindChoices:
             raise ValidationError({'kind': '지원하지 않는 소셜 타입입니다.'})
 
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
-        state = validated_data['state']
-        email = validated_data['social_user_attributes']['email']
-        nickname = validated_data['social_user_attributes']['nickname']
-        profile_image_url = validated_data['social_user_attributes']['profile_image_url']
+        code = validated_data['code']
+        email = validated_data['email']
+        nickname = validated_data['nickname']
+        social_type = validated_data['social_type']
+        profile_image_url = validated_data['profile_image_url']
         user, created = User.objects.get_or_create(email=email, defaults={'password': make_password(None)})
 
         if created:
-            user_profile = Profile.objects.create(user=user, nickname=nickname, kind=state)
+            user_profile = Profile.objects.create(user=user, nickname=nickname, kind=social_type, code=code)
             if profile_image_url != '':
                 name = urlparse(profile_image_url).path.split('/')[-1]
                 response = requests.get(profile_image_url)
-                user_profile.image.save(name, ContentFile(response.content), save=True)
+                user_profile.profile_image.save(name, ContentFile(response.content), save=True)
             user_profile.save()
 
         refresh = RefreshToken.for_user(user)
@@ -55,56 +59,6 @@ class UserSocialLoginSerializer(serializers.Serializer):
             'access': refresh.access_token,
             'refresh': refresh,
         }
-
-    def get_social_user_id(self, code, state):
-        social_user_id = getattr(self, f'get_{state}_user_id')(code)
-        return social_user_id
-
-    def get_kakao_user_id(self, code):
-        url = 'https://kauth.kakao.com/oauth/token'
-        data = {
-            'grant_type': 'authorization_code',
-            'client_id': settings.KAKAO_CLIENT_ID,
-            'redirect_uri': settings.SOCIAL_REDIRECT_URL,
-            'code': code,
-            'client_secret': settings.KAKAO_CLIENT_SECRET,
-        }
-        response = requests.post(url=url, data=data)
-        if not response.ok:
-            raise ValidationError('KAKAO GET TOKEN API ERROR')
-        data = response.json()
-
-        url = 'https://kapi.kakao.com/v2/user/me'
-        headers = {
-            'Authorization': f'Bearer {data["access_token"]}'
-        }
-        response = requests.get(url=url, headers=headers)
-        if not response.ok:
-            raise ValidationError('KAKAO ME API ERROR')
-        data = response.json()
-        email = data['kakao_account'].get("email") if data['kakao_account'].get('has_email') is True else data['id'] + '@email.com'
-        nickname = data['properties'].get('nickname', '')
-        profile_image_url = data['properties'].get('profile_image', '')
-        return {'email': email, 'nickname': nickname, 'profile_image_url': profile_image_url}
-
-    def get_apple_user_id(self, code):
-        url = 'https://appleid.apple.com/auth/token'
-        data = {
-            'grant_type': 'authorization_code',
-            'client_id': settings.APPLE_CLIENT_ID,
-            'client_secret': settings.APPLE_CLIENT_SECRET,
-            'redirect_uri': settings.SOCIAL_REDIRECT_URL,
-            'code': code,
-        }
-        response = requests.post(url=url, data=data)
-        if not response.ok:
-            raise ValidationError('APPLE GET TOKEN API ERROR')
-        data = response.json()
-        decoded_user = jwt.decode(data['user'], '', verify=False)
-        email = decoded_user['email']
-        nickname = decoded_user['name'].get('firstName', '')
-        profile_image_url = ''
-        return {'email': email, 'nickname': nickname, 'profile_image_url': profile_image_url}
 
 
 class UserRegisterSerializer(serializers.Serializer):
@@ -207,7 +161,7 @@ class UserRegisterSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        exclude = ['user']
+        fields = ['nickname', 'profile_image', 'points']
 
 
 class UserDetailUpdateSerializer(serializers.ModelSerializer):

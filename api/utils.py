@@ -1,5 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 from django.utils.deconstruct import deconstructible
+from firebase_admin import messaging
 import datetime
 import uuid
 import os
@@ -59,3 +60,39 @@ def list_converter(datas):
                 }
             )
     return new_product_list
+
+
+# 개인한테 보내기
+def send_to_individual():
+    registration_token = '클라이언트의 FCM 토큰'
+
+    message = messaging.Message(
+    notification=messaging.Notification(
+        title='안녕하세요 타이틀 입니다',
+        body='안녕하세요 메세지 입니다',
+    ),
+    token=registration_token,
+    )
+
+    response = messaging.send(message)
+    # Response is a message ID string.
+    print('Successfully sent message:', response)
+
+
+def send_to_all():
+    messages = [
+        messaging.Message(
+            notification=messaging.Notification('Price drop', '5% off all electronics'),
+            token=registration_token,
+        ),
+        # ...
+        messaging.Message(
+            notification=messaging.Notification('Price drop', '2% off all books'),
+            topic='readers-club',
+        ),
+    ]
+
+    response = messaging.send_all(messages)
+    # See the BatchResponse reference documentation
+    # for the contents of response.
+    print('{0} messages were sent successfully'.format(response.success_count))

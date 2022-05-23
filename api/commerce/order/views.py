@@ -28,5 +28,5 @@ class OrderListView(ListAPIView):
         return Order.objects.prefetch_related('user').filter(user=self.request.user)
 
 
-class GiftCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
+class OrderDoneView(CreateAPIView):
+    pass
