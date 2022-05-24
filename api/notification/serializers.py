@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.notification.models import Notification, NotificationComments
+from api.notification.models import Notification
 
 
 class RecursiveSerializer(serializers.Serializer):
@@ -18,9 +18,3 @@ class NotificationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
-
-
-# class NotificationReviewCreateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = NotificationComments
-#         fields = '__all__'

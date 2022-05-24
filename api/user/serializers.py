@@ -161,7 +161,7 @@ class UserRegisterSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['nickname', 'profile_image', 'points']
+        fields = ['nickname', 'profile_image', 'points', 'firebase_token']
 
 
 class UserDetailUpdateSerializer(serializers.ModelSerializer):

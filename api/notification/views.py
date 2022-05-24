@@ -1,6 +1,6 @@
 from rest_framework.generics import UpdateAPIView, CreateAPIView, ListAPIView, \
     RetrieveAPIView, DestroyAPIView, RetrieveUpdateAPIView
-from api.notification.models import Notification, NotificationComments
+from api.notification.models import Notification
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
