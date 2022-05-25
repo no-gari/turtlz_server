@@ -34,6 +34,9 @@ class NotificationDetailView(RetrieveAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
+    def get_object(self):
+        a=1
+        return Notification.objects.get(id=self.kwargs['id'])
 
 # class NotificationReviewListView(ListAPIView):
 #     serializer_class = Notification
