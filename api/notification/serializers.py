@@ -11,10 +11,4 @@ class RecursiveSerializer(serializers.Serializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        exclude = ['url', 'hits']
-
-
-class NotificationDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
         fields = '__all__'

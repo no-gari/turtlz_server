@@ -4,7 +4,7 @@ from api.notification.models import Notification
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from api.notification.serializers import NotificationSerializer, NotificationDetailSerializer
+from api.notification.serializers import NotificationSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -23,7 +23,7 @@ class NotificationListView(ListAPIView):
 
 
 class NotificationDetailView(RetrieveAPIView):
-    serializer_class = NotificationDetailSerializer
+    serializer_class = NotificationSerializer
     permission_classes = [AllowAny]
     lookup_field = 'id'
 
@@ -35,7 +35,6 @@ class NotificationDetailView(RetrieveAPIView):
         return Response(serializer.data)
 
     def get_object(self):
-        a=1
         return Notification.objects.get(id=self.kwargs['id'])
 
 # class NotificationReviewListView(ListAPIView):
