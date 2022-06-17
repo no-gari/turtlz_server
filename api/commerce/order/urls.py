@@ -1,13 +1,12 @@
+from api.commerce.order.views import order_create, order_list, get_order, order_cancel, request_refund, order_done
 from django.urls import path
-from api.commerce.order.views import OrderCreateView, OrderListView, OrderRetrieveView, OrderDoneView
 
 urlpatterns = [
-    # 일반적인 주문
-    path('create/', OrderCreateView.as_view()),
-    path('order-done/<str:order_number>/', OrderDoneView.as_view()),
-    path('list/', OrderListView.as_view()),
-    path('<str:order_number>/', OrderRetrieveView.as_view()),
-
-    # 선물하기
-    # path('gift/<str:order_number>/'),
+    path('list/', order_list),
+    path('cancel-list/', order_list),
+    path('create/', order_create),
+    path('cancel/', order_cancel),
+    path('<str:order_id>/', get_order),
+    path('order-done/<str:order_id>/', order_done),
+    path('request-refund/<str:order_id>/', request_refund),
 ]

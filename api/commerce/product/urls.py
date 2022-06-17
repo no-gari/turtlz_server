@@ -1,10 +1,10 @@
-from api.commerce.product.views import ProductListView, ProductDetailView, ProductLikeView, WishListProductView
+from api.commerce.product.views import ProductListByCategoriesView, ProductDetailView, order_temp
 from django.urls import path
 
-
 urlpatterns = [
-    path('', ProductListView.as_view()),
-    path('like/', WishListProductView.as_view()),
-    path('<int:pk>/', ProductDetailView.as_view()),
-    path('<int:pk>/like/', ProductLikeView.as_view()),
+    path('<str:category>/list/', ProductListByCategoriesView.as_view()),
+    path('list/', ProductListByCategoriesView.as_view()),
+    path('detail/<str:id>/', ProductDetailView.as_view()),
+    path('order-temp/', order_temp),
+    # path('brand/<str:brand>/', ProductListByCategoriesView.as_view()),
 ]

@@ -1,40 +1,106 @@
-from api.commerce.cart.serializers import CartItemSerializer, CartItemCreateSerializer, CartProductSerializer
-from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
-from rest_framework.permissions import IsAuthenticated
-from api.commerce.cart.models import CartItem
+from api.commerce.customer.serializers import AddressSerializer, ShippingrRequestSerializers
+from api.commerce.cart.serializers import CartListSerializer, CartItemSerializer
+from api.commerce.customer.models import UserShipping, ShippingRequest
+from rest_framework.exceptions import ValidationError
+from api.clayful_client import ClayfulCartClient
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from api.utils import list_converter
 from rest_framework import status
-from json import loads, dumps
 
 
-class CartItemRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
-    serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
-    allowed_methods = ['put', 'delete']
 
-    def get_object(self):
-        cart_item = CartItem.objects.select_related('user').get(user=self.request.user, product_variant=self.request.POST['product_variant'])
-        return cart_item
+@api_view(["GET"])
+def get_cart(request, *args, **kwargs):
+    if not request.user.is_authenticated:
+        return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        clayful_cart_client = ClayfulCartClient(auth_token=request.META['HTTP_CLAYFUL'])
+        my_cart = clayful_cart_client.get_cart()
+        if not my_cart.status == 200:
+            raise ValidationError({'error_msg': '서버 에러입니다. 다시 시도해주세요.'})
+        if not my_cart.data['cart']['items'] == []:
+            serializer = CartListSerializer(my_cart.data['cart']['items'], many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '장바구니를 불러오지 못했습니다. 다시 시도해주세요.'})
 
 
-class CartItemCreateView(CreateAPIView):
-    serializer_class = CartItemCreateSerializer
-    pagination_class = None
-    permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.select_related('user')
+@api_view(["POST"])
+def add_to_cart(request, *args, **kwargs):
+    if not request.user.is_authenticated:
+        return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        added_list = []
+        clayful_cart_client = ClayfulCartClient(auth_token=request.META['HTTP_CLAYFUL'])
+        for data in request.data:
+            response = clayful_cart_client.add_item(
+                product_id=data.get('product'),
+                variant=data.get('variant'),
+                quantity=data.get('quantity')
+            )
+            if response.status != 200:
+                raise ValidationError({'error_msg': '상품 추가에 실패했습니다.'})
+            added_list.append(response.data)
+        serializer = CartItemSerializer(added_list, many=True)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '다시 시도해주세요.'})
 
 
-class CartItemListView(ListAPIView):
-    serializer_class = CartProductSerializer
-    pagination_class = None
-    permission_classes = [IsAuthenticated]
+@api_view(["DELETE"])
+def delete_item(request, *args, **kwargs):
+    if not request.user.is_authenticated:
+        return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        clayful_cart_client = ClayfulCartClient(auth_token=request.META['HTTP_CLAYFUL'])
+        for data in request.data:
+            response = clayful_cart_client.delete_item(item_id=data['item_id'])
+            if not response.status == 204:
+                raise ValidationError({'error_msg': '품목을 삭제하지 못했습니다. 다시 시도해주세요.'})
+        return Response(status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '품목을 삭제하지 못했습니다. 다시 시도해주세요.'})
 
-    def get_queryset(self):
-        return CartItem.objects.select_related('user').filter(user=self.request.user)
 
-    def list(self, request, *args, **kwargs):
-        instance = self.get_queryset()
-        cart_products = loads(dumps(self.get_serializer(instance, many=True).data))
-        product_list = list_converter(cart_products)
-        return Response(product_list, status=status.HTTP_200_OK)
+@api_view(["DELETE"])
+def empty_cart(request, *args, **kwargs):
+    if not request.user.is_authenticated:
+        return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
+    clayful_cart_client = ClayfulCartClient(auth_token=request.META['HTTP_CLAYFUL'])
+    try:
+        response = clayful_cart_client.empty_cart()
+        if response.status == 204:
+            return Response(response.data, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '장바구니를 비우지 못했습니다. 다시 시도해주세요.'})
+
+
+@api_view(["GET"])
+def count_items(request, *args, **kwargs):
+    if not request.user.is_authenticated:
+        return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
+    clayful_cart_client = ClayfulCartClient(auth_token=request.META['HTTP_CLAYFUL'])
+    try:
+        response = clayful_cart_client.count_items_cart()
+        if response.status == 200:
+            return Response(response.data['count']['raw'], status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '다시 시도해주세요.'})
+
+
+@api_view(["POST"])
+def order_temp(request, *args, **kwargs):
+    if not request.user.is_authenticated:
+        return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        serialized_data = request.data
+        address = UserShipping.objects.filter(is_default=True, user=request.user).first()
+        serialized_address = AddressSerializer(address).data
+        serialized_requests = ShippingrRequestSerializers(ShippingRequest.objects.all(), many=True).data
+        return Response({'products': serialized_data, 'address': serialized_address,
+                         'request': {'shipping_request': serialized_requests, 'additional_request': ''},
+                         'coupon': {'Id': None, 'name': None, 'description': None, 'min_price': None,
+                                    'discount': None, 'expires_at': None}}, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '상품 에러입니다.'})

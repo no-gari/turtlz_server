@@ -1,33 +1,76 @@
 from rest_framework import serializers
-from rest_framework.validators import ValidationError
-from api.commerce.coupon.models import Coupon, CouponUser
+from django.utils.html import strip_tags
 
 
-class CouponSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Coupon
-        fields = ['id', 'brand', 'name', 'discount_price', 'expire_date']
-        read_only_fields = ['id', 'name', 'discount_price', 'expire_date']
+class CouponSerializer(serializers.Serializer):
+    _id = serializers.CharField()
+    name = serializers.CharField()
+    description = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
+    expires_at = serializers.SerializerMethodField()
+
+    def get_description(self, value):
+        description = value.get('description', None)
+        return None if description == None else strip_tags(description)
+
+    def get_min_price(self, value):
+        try:
+            min_price = value['price']['min']['raw']
+            return min_price
+        except:
+            return None
+
+    def get_discount(self, value):
+        try:
+            discount = value['discount']['value']['raw']
+            return discount
+        except:
+            return None
+
+    def get_expires_at(self, value):
+        try:
+            expires_at = value['expiresAt']['formatted']
+            return expires_at
+        except:
+            return None
 
 
-class CouponUserSerializer(serializers.ModelSerializer):
-    coupon = CouponSerializer()
+class CouponDetailSerializer(serializers.Serializer):
+    _id = serializers.CharField()
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
+    expires_at = serializers.SerializerMethodField()
 
-    class Meta:
-        model = CouponUser
-        fields = ['coupon', 'used']
+    def get_name(self, value):
+        try:
+            name = value['name']
+            return name
+        except:
+            return None
 
+    def get_description(self, value):
+        try:
+            description = strip_tags(value['description'])
+            return description
+        except:
+            return None
 
-class CouponUserCreateSerializer(serializers.Serializer):
-    coupon = serializers.CharField(write_only=True)
+    def get_min_price(self, value):
+        try:
+            min_price = value['price']['min']['raw']
+            return min_price
+        except:
+            return None
 
-    def create(self, validated_data):
-        coupon_user = CouponUser.objects.create(user=self.context['request'].user, coupon_id=validated_data['coupon'])
-        coupon_user.save()
-        return coupon_user
+    def get_discount(self, value):
+        try:
+            discount = value['discount']['value']['raw']
+            return discount
+        except:
+            return None
 
-    def validate(self, obj):
-        coupon = Coupon.objects.get(id=obj['coupon'])
-        if coupon.coupon_limit is not None and coupon.coupon_limit == 0:
-            raise ValidationError({'error': '이미 소진된 쿠폰입니다.'})
-        return super().validate(obj)
+    def get_expires_at(self, value):
+        return None
