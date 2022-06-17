@@ -12,10 +12,7 @@ ALLOWED_HOSTS = ['*.ap-northeast-2.elasticbeanstalk.com']
 
 # BASE DJANGO APPS
 DJANGO_APPS = [
-    # DJANGO ADMIN CUSTOM CSS
     'admin_menu',
-    # DJANGO DEFAULT APPS
-    'admin_volt.apps.AdminVoltConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,23 +26,24 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     'api.user.apps.UserConfig',
     'api.logger.apps.LoggerConfig',
-    'api.magazine.apps.MagazineConfig',
-    'api.community.apps.CommunityConfig',
     'api.notification.apps.NotificationConfig',
+    # 'api.mypage.apps.MypageConfig',
+    # 'api.magazine.apps.MagazineConfig',
+    # 'api.firebase.apps.FirebaseConfig',
 ]
 
 # COMMERCE API APPS
 COMMERCE_APPS = [
     'api.commerce.cart.apps.CartConfig',
-    'api.commerce.order.apps.OrderConfig',
     'api.commerce.brand.apps.BrandConfig',
+    'api.commerce.order.apps.OrderConfig',
     'api.commerce.review.apps.ReviewConfig',
+    'api.commerce.search.apps.SearchConfig',
     'api.commerce.coupon.apps.CouponConfig',
+    'api.commerce.comment.apps.CommentConfig',
     'api.commerce.product.apps.ProductConfig',
-    'api.commerce.invoice.apps.InvoiceConfig',
-    'api.commerce.address.apps.AddressConfig',
-    'api.commerce.category.apps.CategoryConfig',
-    'api.commerce.checkout.apps.CheckoutConfig',
+    'api.commerce.customer.apps.CustomerConfig',
+    'api.commerce.collection.apps.CollectionConfig',
 ]
 
 # OTHER LIBRARIES
@@ -166,11 +164,11 @@ REST_FRAMEWORK = {
 }
 
 # ELASTIC SEARCH
-ELASTICSEARCH_DSL={
-    'default': {
-        'hosts': 'localhost:9200'
-    },
-}
+# ELASTICSEARCH_DSL={
+#     'default': {
+#         'hosts': 'localhost:9200'
+#     },
+# }
 
 
 # SUMMERNOTE
@@ -181,14 +179,14 @@ SUMMERNOTE_CONFIG = {
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # COOLSMS
-COOLSMS_API_KEY = 'NCSMVIWDWDVLDXLG'
-COOLSMS_API_SECRET = 'N9KGGSNNCBONQZAYKEP8QDIMPBISY8PS'
-COOLSMS_FROM_PHONE = '01083589504'
+# COOLSMS_API_KEY = 'NCSMVIWDWDVLDXLG'
+# COOLSMS_API_SECRET = 'N9KGGSNNCBONQZAYKEP8QDIMPBISY8PS'
+# COOLSMS_FROM_PHONE = '01083589504'
 
 # MAILGUN
-MAILGUN_API_KEY = "a1209bfad6ca285a9ad2e0d7c1356b80-a0cfb957-2866bfcd"
-MAILGUN_DOMAIN = "https://api.mailgun.net/v3/api.ustain.be"
-MAILGUN_FROM_EMAIL = 'sofaissofa@icloud.com'
+# MAILGUN_API_KEY = "a1209bfad6ca285a9ad2e0d7c1356b80-a0cfb957-2866bfcd"
+# MAILGUN_DOMAIN = "https://api.mailgun.net/v3/api.ustain.be"
+# MAILGUN_FROM_EMAIL = 'sofaissofa@icloud.com'
 
 # FIREBASE PUSH NOTIFICATION
 cred_path = os.path.join(BASE_DIR, "serviceAccountKey.json")
