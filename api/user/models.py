@@ -66,6 +66,7 @@ class Profile(models.Model):
     code = models.CharField(max_length=1024, verbose_name=_('SNS 고유 코드'), null=True, blank=True)
     points = models.PositiveIntegerField(default=0, verbose_name=_('포인트'))
     firebase_token = models.CharField(max_length=1024, verbose_name=_('파이어베이스 토큰'), null=True, blank=True)
+    clayful_token = models.CharField(max_length=1024, verbose_name=_('클레이풀 토큰'), null=True, blank=True)
 
     class Meta:
         verbose_name = '프로필'

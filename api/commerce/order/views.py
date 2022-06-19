@@ -4,7 +4,6 @@ from rest_framework.exceptions import ValidationError
 from api.commerce.list_helper import get_index
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from api.mypage.models import MyPageInfo
 from rest_framework import status
 
 
@@ -105,10 +104,6 @@ def order_done(request, *args, **kwargs):
     try:
         clf_order_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
         order = clf_order_client.order_done(order_id=kwargs['order_id'])
-        mypage_info = MyPageInfo.objects.get(user=request.user)
-        if not mypage_info.order_done == 3:
-            mypage_info.order_done += 1
-            mypage_info.save()
         if order.status == 200:
             return Response(status=status.HTTP_200_OK)
     except:

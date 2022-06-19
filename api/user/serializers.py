@@ -8,6 +8,7 @@ from api.logger.models import PhoneLog
 from rest_framework import serializers
 from django.core.files.base import ContentFile
 from api.user.validators import validate_password
+from api.clayful_client import ClayfulCustomerClient
 from django.contrib.auth.hashers import make_password
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -47,7 +48,18 @@ class UserSocialLoginSerializer(serializers.Serializer):
         user, created = User.objects.get_or_create(email=email, defaults={'password': make_password(None)})
 
         if created:
-            user_profile = Profile.objects.create(user=user, nickname=nickname, kind=social_type, code=code)
+            clayful_customer_client = ClayfulCustomerClient()
+            clayful_register = clayful_customer_client.clayful_register(email=email, nickname=nickname)
+
+            if not clayful_register.status == 201:
+                user.delete()
+                raise ValidationError({'error_msg': '서버 에러입니다. 다시 시도해주세요.'})
+            else:
+                clayful_login = clayful_customer_client.clayful_login(email=email)
+                token = clayful_login.data['token']
+
+            user_profile = Profile.objects.create(user=user, clayful_token=token, nickname=nickname, kind=social_type, code=code)
+
             if profile_image_url != '':
                 name = urlparse(profile_image_url).path.split('/')[-1]
                 response = requests.get(profile_image_url)

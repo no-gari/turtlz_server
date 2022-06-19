@@ -17,4 +17,4 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('nickname', 'kind', 'code', 'user', 'firebase_token')
+    list_display = ('nickname', 'kind', 'code', 'user', 'firebase_token', 'clayful_token')

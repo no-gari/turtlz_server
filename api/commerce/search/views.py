@@ -1,11 +1,22 @@
+from rest_framework.pagination import PageNumberPagination
+
 from api.clayful_client import ClayfulProductClient, ClayfulBrandClient
 from api.commerce.brand.serializers import BrandListRetrieveSerializer
+from api.commerce.search.serializers import SearchKeywordSerializer
 from api.commerce.product.serializers import ProductListSerializer
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView
 from rest_framework.decorators import api_view
 from api.commerce.list_helper import get_index
 from rest_framework.response import Response
+from .models import SearchKeywords
 from rest_framework import status
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 20
 
 
 @api_view(["GET"])
@@ -36,3 +47,11 @@ def search_list(request, *args, **kwargs):
                 {'products': serialized_products, 'brands': serialized_brands}}, status=status.HTTP_200_OK)
     except:
         raise ValidationError({'error_msg': '다시 한 번 시도 해주세요.'})
+
+
+class SearchKeyword(ListAPIView):
+    pagination_class = StandardResultsSetPagination
+    serializer_class = SearchKeywordSerializer
+
+    def get_queryset(self):
+        return SearchKeywords.objects.all().order_by('order')

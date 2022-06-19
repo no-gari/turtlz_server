@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from api.mypage.models import MyPageInfo
 from rest_framework import status
 
 
@@ -53,10 +52,6 @@ def create_review(request, *args, **kwargs):
             product=request.data['product'],
             body=request.data['body']
         )
-        mypage_info = MyPageInfo.objects.get(user=request.user)
-        if not mypage_info.order_reviews == 3:
-            mypage_info.order_reviews += 1
-            mypage_info.save()
         return Response(response.data, status=status.HTTP_200_OK)
     except:
         raise ValidationError({'error_msg': '리뷰를 생성하는데 실패했습니다.'})

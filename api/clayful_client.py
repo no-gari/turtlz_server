@@ -18,7 +18,7 @@ class ClayfulCustomerClient:
 
     def clayful_register(self, **kwargs):
         customer = self.customer
-        payload = {'connect': True, 'userId': kwargs['email'], 'mobile': kwargs['mobile'], 'name': {'full': '사용자'}}
+        payload = {'connect': True, 'userId': kwargs['email'], 'name': {'full': kwargs['nickname']}}
         try:
             response = customer.create(payload)
             return response
