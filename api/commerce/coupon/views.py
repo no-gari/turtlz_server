@@ -34,9 +34,8 @@ class MyCouponListView(ListAPIView):
     serializer_class = CouponSerializer
 
     def get_queryset(self):
-        clayful = self.request.META['HTTP_CLAYFUL']
         clf_customer_client = ClayfulCustomerClient()
-        response = clf_customer_client.clayful_customer_coupons_list(clayful=clayful)
+        response = clf_customer_client.clayful_customer_coupons_list(clayfu=self.request.user.profile.clayful_token)
         if response.status != 200:
             raise ValidationError({'error_msg': '쿠폰 목록을 불러오는데 실패했습니다.'})
         return response.data
@@ -56,9 +55,8 @@ def coupon_count(request, *args, **kwargs):
 @api_view(["POST"])
 def coupon_issue(request, *args, **kwargs):
     try:
-        clayful = request.META['HTTP_CLAYFUL']
         clf_customer_client = ClayfulCustomerClient()
-        customer_id = clf_customer_client.clayful_customer_get_me(clayful=clayful)
+        customer_id = clf_customer_client.clayful_customer_get_me(clayful=request.user.profile.clayful_token)
         # 위에서 아이디 구해서 밑에다 넣어야 됨.
         response = clf_customer_client.clayful_customer_add_coupon(customer_id=customer_id, coupon_id=kwargs['coupon_id'])
         return response

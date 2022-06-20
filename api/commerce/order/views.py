@@ -12,7 +12,7 @@ def order_create(request, *args, **kwargs):
     if not request.user.is_authenticated:
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        clf_client = ClayfulCartClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_client = ClayfulCartClient(auth_token=request.user.profile.clayful_token)
         first = request.data['products'][0]
         if first['_id'] is None:
             products = ''
@@ -38,7 +38,7 @@ def order_cancel(request, *args, **kwargs):
     if not request.user.is_authenticated:
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        clf_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_client = ClayfulOrderClient(auth_token=request.user.profile.clayful_token)
         order_id, payload = request.data['order_id'], {'reason': request.data.get('reason', '...')}
         response = clf_client.order_cancel(order_id=order_id, payload=payload)
         if response.status == 200:
@@ -53,7 +53,7 @@ def order_list(request, *args, **kwargs):
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
         page = kwargs.get('page', 1)
-        clf_order_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_order_client = ClayfulOrderClient(auth_token=request.user.profile.clayful_token)
         order_count = clf_order_client.order_count().data
         max_index, previous, next_val = get_index(request, order_count['count']['raw'], page)
         order = clf_order_client.get_order_list(page=page)
@@ -71,7 +71,7 @@ def cancel_list(request, *args, **kwargs):
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
         page = kwargs.get('page', 1)
-        clf_order_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_order_client = ClayfulOrderClient(auth_token=request.user.profile.clayful_token)
         order_count = clf_order_client.order_count().data
         max_index, previous, next_val = get_index(request, order_count['count']['raw'], page)
         order = clf_order_client.get_cancel_list(page=page)
@@ -88,7 +88,7 @@ def get_order(request, *args, **kwargs):
     if not request.user.is_authenticated:
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        clf_order_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_order_client = ClayfulOrderClient(auth_token=request.user.profile.clayful_token)
         order = clf_order_client.get_order(order_id=kwargs['order_id'])
         if order.status == 200:
             serialized_data = MyOrderSerializer(order.data).data
@@ -102,7 +102,7 @@ def order_done(request, *args, **kwargs):
     if not request.user.is_authenticated:
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        clf_order_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_order_client = ClayfulOrderClient(auth_token=request.user.profile.clayful_token)
         order = clf_order_client.order_done(order_id=kwargs['order_id'])
         if order.status == 200:
             return Response(status=status.HTTP_200_OK)
@@ -115,7 +115,7 @@ def request_refund(request, *args, **kwargs):
     if not request.user.is_authenticated:
         return Response({'error_msg': '로그인 후 이용해주세요,'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        clf_order_client = ClayfulOrderClient(auth_token=request.META['HTTP_CLAYFUL'])
+        clf_order_client = ClayfulOrderClient(auth_token=request.user.profile.clayful_token)
         request_refund = clf_order_client.request_refund(order_id=kwargs['order_id'],
             reason=request.data['reason'], items=request.data['items'], quantity=request.data['quantity'])
         if request_refund.status == 200:

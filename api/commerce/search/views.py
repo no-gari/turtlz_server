@@ -55,3 +55,43 @@ class SearchKeyword(ListAPIView):
 
     def get_queryset(self):
         return SearchKeywords.objects.all().order_by('order')
+
+
+@api_view(["GET"])
+def search_product(request, *args, **kwargs):
+    try:
+        keyword = kwargs.get('keyword')
+        page = kwargs.get('page', 1)
+        if keyword.strip() == '':
+            raise ValidationError({'error_msg': '검색어를 입력 해주세요.'})
+        clf_product_client = ClayfulProductClient()
+        product_response = clf_product_client.search_products(keyword=keyword, page=page)
+        product_count = clf_product_client.search_products_count(keyword=keyword).data['count']['raw']
+        max_index, previous, next_val = get_index(request, product_count, page)
+        if product_response.data:
+            serialized_products = ProductListSerializer(product_response.data, many=True).data
+        else:
+            serialized_products = []
+        return Response(
+            {'previous': previous, 'next': next_val, 'count': 10, 'results': serialized_products}, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '다시 한 번 시도 해주세요.'})
+
+
+@api_view(["GET"])
+def search_brand(request, *args, **kwargs):
+    try:
+        keyword = kwargs.get('keyword')
+        page = kwargs.get('page', 1)
+        clf_brand_client = ClayfulBrandClient()
+        brand_response = clf_brand_client.search_brands(keyword=keyword)
+        if not brand_response.status == 200:
+            raise ValidationError({'error_msg': '다시 한 번 시도 해주세요.'})
+        if brand_response.data:
+            serialized_brands = BrandListRetrieveSerializer(brand_response.data, many=True).data
+        else:
+            serialized_brands = []
+        return Response(
+            {'previous': None if page == 1 else page - 1, 'next': page+1, 'count': 10, 'results': serialized_brands}, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '다시 한 번 시도 해주세요.'})

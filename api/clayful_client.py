@@ -221,7 +221,7 @@ class ClayfulBrandClient:
                     'q': kwargs['keyword'],
                     'search': 'name.ko',
                     'searchMatch': 'partial',
-                    'limit': 120,
+                    'limit': 10,
                     'page': kwargs.get('page', 1)
                 }
             }
