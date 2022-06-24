@@ -38,14 +38,12 @@ def get_brand_product(request, *args, **kwargs):
 @permission_classes([AllowAny])
 def get_brand_list(request, *args, **kwargs):
     clayful_brand_client = ClayfulBrandClient()
-    page = kwargs.get('page', 1)
+    page = request.query_params['page']
     try:
-        brand_client = clayful_brand_client.get_brand_count().data
-        max_index, previous, next_val = get_index(request, brand_client['count']['raw'], page)
         brand_list = clayful_brand_client.get_brand_list(page=page)
         if not brand_list.status == 200:
             raise ValidationError({'error_msg': '브랜드 목록을 불러올 수 없습니다.'})
         serialized_data = BrandListRetrieveSerializer(brand_list.data, many=True).data
-        return Response({'previous': previous, 'next': next_val, 'count': 10, 'results': serialized_data}, status=status.HTTP_200_OK)
+        return Response({'previous': str(int(page)), 'next': str(int(page)+1), 'count': 10, 'results': serialized_data}, status=status.HTTP_200_OK)
     except Exception:
         raise ValidationError({'error_msg': '브랜드 목록을 불러올 수 없습니다.'})

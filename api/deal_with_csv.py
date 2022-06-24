@@ -15,16 +15,20 @@ Clayful.config({
 clayful_brand = Clayful.Brand
 
 f = open('220623.csv', 'r', encoding='utf-8')
-wf = open('brand.csv', 'w', newline='', encoding='utf-8')
+wf = open('new_brand.csv', 'w', newline='', encoding='utf-8')
+# wf2 = open('new_products.csv', 'w', newline='', encoding='utf-8')
 rdr = csv.reader(f)
 wr = csv.writer(wf)
+# wr2 = csv.writer(wf2)
 brand_list = []
+# products = []
 
 options = {}
 
 for line in rdr:
-    if not line[41] == '-':
+    if not line[41] == '-' and line[14] == 'instock' and int(line[25]) >= 49000:
         brand_list.append(line[41])
+        # products.append(line[4])
     else:
         pass
 new_brand_list = list(set(brand_list))
@@ -46,11 +50,15 @@ for brand in new_brand_list:
         },
         {}
     )
-
     time.sleep(0.5)
     index += 1
 
+index = 0
+
+# for product in products:
+#     wr2.writerow([products[index]])
+#     index += 1
+
 f.close()
 wf.close()
-
-
+wf2.close()

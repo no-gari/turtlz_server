@@ -189,8 +189,9 @@ class ClayfulBrandClient:
         try:
             options = {
                 'query': {
-                    'limit': 10,
-                    'page': kwargs.get('page', 1)
+                    'limit': kwargs.get('limit', '40'),
+                    'page': kwargs['page'],
+                    'sort': 'createdAt',
                 }
             }
             response = self.brand.list(options)
@@ -221,7 +222,7 @@ class ClayfulBrandClient:
                     'q': kwargs['keyword'],
                     'search': 'name.ko',
                     'searchMatch': 'partial',
-                    'limit': 10,
+                    'limit': 40,
                     'page': kwargs.get('page', 1)
                 }
             }
