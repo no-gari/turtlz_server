@@ -6,7 +6,7 @@ pymysql.install_as_MySQLdb()
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
-DB = 'mysql'
+DB = 'sqlite'
 
 if DB == 'sqlite':
     DATABASES = {

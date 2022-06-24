@@ -35,7 +35,7 @@ class MyCouponListView(ListAPIView):
 
     def get_queryset(self):
         clf_customer_client = ClayfulCustomerClient()
-        response = clf_customer_client.clayful_customer_coupons_list(clayfu=self.request.user.profile.clayful_token)
+        response = clf_customer_client.clayful_customer_coupons_list(clayful=self.request.user.profile.clayful_token)
         if response.status != 200:
             raise ValidationError({'error_msg': '쿠폰 목록을 불러오는데 실패했습니다.'})
         return response.data

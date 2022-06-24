@@ -66,6 +66,9 @@ class UserSocialLoginSerializer(serializers.Serializer):
                 user_profile.profile_image.save(name, ContentFile(response.content), save=True)
             user_profile.save()
 
+        else:
+            a=1
+            b=2
         refresh = RefreshToken.for_user(user)
         return {
             'access': refresh.access_token,

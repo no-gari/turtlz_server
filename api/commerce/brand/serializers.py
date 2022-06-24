@@ -8,22 +8,17 @@ from rest_framework import serializers
 
 class BrandListRetrieveSerializer(serializers.Serializer):
     _id = serializers.CharField(read_only=True)
-    description = serializers.SerializerMethodField(read_only=True)
     name = serializers.CharField(read_only=True)
-    logo = serializers.SerializerMethodField(read_only=True)
 
     def get_logo(self, value):
         return value['logo']['url']
 
-    def get_description(self, value):
-        return strip_tags(value['description'])
-
 
 class BrandRetrieveSerializer(serializers.Serializer):
     _id = serializers.CharField(read_only=True)
-    description = serializers.SerializerMethodField(read_only=True)
+    # description = serializers.SerializerMethodField(read_only=True)
     name = serializers.CharField(read_only=True)
-    logo = serializers.SerializerMethodField(read_only=True)
+    # logo = serializers.SerializerMethodField(read_only=True)
     magazines = serializers.SerializerMethodField(required=False)
     products = serializers.SerializerMethodField(required=False)
 

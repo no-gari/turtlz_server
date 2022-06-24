@@ -9,13 +9,17 @@ from api.commerce.list_helper import get_index
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from django.conf import settings
 
 
 class ProductListByCategoriesView(ListAPIView):
     def get_queryset(self):
         try:
             brand = self.kwargs.get('brand', 'any')
-            category = self.kwargs.get('category', 'any')
+            if self.kwargs.get('category') == '':
+                category = settings.CLAYFUL_CAMPING_ID
+            else:
+                category = self.kwargs.get('category', 'any')
             sort = self.request.query_params.get('sort', 'rating.count')
             page = self.request.query_params.get('page', '1')
             clayful_product_client = ClayfulProductClient()
@@ -30,7 +34,10 @@ class ProductListByCategoriesView(ListAPIView):
         try:
             queryset = self.get_queryset()
             brand = self.kwargs.get('brand', 'any')
-            category = self.kwargs.get('category', 'any')
+            if self.kwargs.get('category') == '':
+                category = settings.CLAYFUL_CAMPING_ID
+            else:
+                category = self.kwargs.get('category', 'any')
             page = int(self.request.query_params.get('page', '1'))
             clf_product_client = ClayfulProductClient()
             products_count = clf_product_client.count_products(collection=category, brand=brand).data

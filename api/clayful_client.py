@@ -18,7 +18,7 @@ class ClayfulCustomerClient:
 
     def clayful_register(self, **kwargs):
         customer = self.customer
-        payload = {'connect': True, 'userId': kwargs['email'], 'name': {'full': kwargs['nickname']}}
+        payload = {'connect': True, 'userId': kwargs['email'], 'name': {'full': kwargs['nickname']}, 'mobile': '01012341234'}
         try:
             response = customer.create(payload)
             return response
@@ -190,7 +190,7 @@ class ClayfulBrandClient:
             options = {
                 'query': {
                     'limit': 10,
-                    'page': kwargs.get('page' ,1)
+                    'page': kwargs.get('page', 1)
                 }
             }
             response = self.brand.list(options)
@@ -215,6 +215,22 @@ class ClayfulBrandClient:
             return ValidationError({'error_msg': error_msg})
 
     def search_brands(self, **kwargs):
+        try:
+            options = {
+                'query': {
+                    'q': kwargs['keyword'],
+                    'search': 'name.ko',
+                    'searchMatch': 'partial',
+                    'limit': 10,
+                    'page': kwargs.get('page', 1)
+                }
+            }
+            response = self.brand.list(options)
+            return response
+        except Exception as err:
+            return ValidationError({'error_msg': [err.message]})
+
+    def create_brand(self, **kwargs):
         try:
             options = {
                 'query': {

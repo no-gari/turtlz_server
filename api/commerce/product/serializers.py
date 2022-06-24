@@ -31,7 +31,8 @@ class ProductListSerializer(serializers.Serializer):
         return value['price']['sale']['raw']
 
     def get_discount_rate(self, value):
-        return value['discount']['value']['raw']
+        rate = round(value['price']['sale']['raw'] / value['price']['original']['raw'] * 100)
+        return rate
 
     def get_brand(self, value):
         return value['brand']['name']

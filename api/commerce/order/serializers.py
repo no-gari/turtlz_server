@@ -29,9 +29,9 @@ class OrderSerializer(serializers.Serializer):
 
         return {
             'shipping': {'name': {'full': name}, 'postcode': postcode, 'country': "KR", 'city': city,
-                         'address1': address1, 'address2': address2, 'mobile': mobile},
+                         'address1': address1, 'address2': address2, 'mobile': mobile, 'phone': mobile},
             'billing': {'name': {'full': name}, 'postcode': postcode, 'country': "KR", 'city': city,
-                        'address1': address1, 'address2': address2, 'mobile': mobile}}
+                        'address1': address1, 'address2': address2, 'mobile': mobile, 'phone': mobile}}
 
     def get_discount(self, value):
         try:
