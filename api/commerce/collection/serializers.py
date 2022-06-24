@@ -7,5 +7,4 @@ class CollectionRetrieveSerializers(serializers.Serializer):
     thumbnail = serializers.SerializerMethodField(read_only=True)
 
     def get_thumbnail(self, value):
-        ㅁ=1
         return value['thumbnail']['url']
