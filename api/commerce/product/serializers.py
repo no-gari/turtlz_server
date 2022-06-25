@@ -32,9 +32,12 @@ class ProductListSerializer(serializers.Serializer):
 
     def get_discount_rate(self, value):
         rate = round(value['price']['sale']['raw'] / value['price']['original']['raw'] * 100)
-        return rate
+        return 100 - rate
 
     def get_brand(self, value):
+        ㅁ=1
+        ㅠ=1
+
         return value['brand']['name']
 
 
@@ -152,7 +155,6 @@ class ProductDetailSerializer(serializers.Serializer):
     def get_brand(self, value):
         try:
             brand = value['brand']
-            brand['url'] = value['brand']['logo']['url']
             brand.pop('slug')
             brand.pop('logo')
             return brand
@@ -248,3 +250,89 @@ class ProductCheckoutSerializer(serializers.Serializer):
             if variant_id == variant['_id']:
                 sale_price = variant['price']['sale']['raw']
         return sale_price
+
+
+class ClayfulOptionSerializer(serializers.Serializer):
+    class ClayfulVariantsSerializer(serializers.Serializer):
+        slug = serializers.CharField(read_only=True)
+        name = serializers.CharField(read_only=True)
+        price = serializers.CharField(read_only=True)
+
+    type = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    options = ClayfulVariantsSerializer(read_only=True, many=True)
+
+[
+    {
+        "type":"select",
+        "name":"사이즈",
+        "options":
+            [
+                {"slug":"0","name":"아이보리 L사이즈 의자 2개","price":"0"},
+                {"slug":"1","name":"그린 L사이즈 의자 2개","price":"0"},
+                {"slug":"2","name":"아이보리 XL사이즈 의자 2개","price":"0"},
+                {"slug":"3","name":"그린 XL사이즈 의자 2개","price":"0"},
+                {"slug":"4","name":"블랙 L사이즈 의자 2개","price":"0"},
+                {"slug":"5","name":"블랙 XL사이즈 의자 2개","price":"0"}
+            ],
+        "slug":"first"
+    },
+    {
+        "type":"select",
+        "name":"사은품",
+        "options":
+             [
+                 {"slug":"00","name":"원목스툴","price":"0"},
+                 {"slug":"01","name":"보냉백","price":"0"},
+                 {"slug":"10","name":"원목스툴","price":"0"},
+                 {"slug":"11","name":"보냉백","price":"0"},
+                 {"slug":"20","name":"원목스툴","price":"10000"},
+                 {"slug":"21","name":"보냉백","price":"10000"},
+                 {"slug":"30","name":"원목스툴","price":"10000"},
+                 {"slug":"31","name":"보냉백","price":"10000"},
+                 {"slug":"40","name":"원목스툴","price":"0"},
+                 {"slug":"41","name":"보냉백","price":"0"},
+                 {"slug":"50","name":"원목스툴","price":"10000"},
+                 {"slug":"51","name":"보냉백","price":"10000"}
+             ],
+     "slug":"second"
+    }
+]
+
+
+[
+    {
+        "type":"select",
+        "name":"컬러",
+        "options":
+            [
+                {"slug":"0","name":"블랙(기본상판)","price":"0"},
+                {"slug":"1","name":"화이트(기본상판)","price":"0"},
+                {"slug":"2","name":"블랙(우드상판)","price":"5500"},
+                {"slug":"3","name":"화이트(우드상판)","price":"5500"},
+                {"slug":"4","name":"카키(일반상판)","price":"0"},
+                {"slug":"5","name":"탄(일반상판)","price":"0"},
+                {"slug":"add0","name":"(추가구매상품) 우드 상판 단품 ","price":"-7400"}],
+        "slug":"first"
+    }
+]
+
+[
+    {
+        "type":"select",
+        "name":"색상",
+        "options":
+      [
+          {"slug":"0","name":"카키+브라운","price":"0"},
+          {"slug":"1","name":"블랙","price":"0"},
+          {"slug":"add0","name":"(추가구매상품) 업라이트폴 180cm 2개세트 ","price":"-158000"},
+          {"slug":"add1","name":"(추가구매상품) 바닥시트 ","price":"-143000"},
+          {"slug":"add2","name":"(추가구매상품) 플라이(카키) ","price":"-138000"},
+          {"slug":"add3","name":"(추가구매상품) 플라이(블랙) ","price":"-138000"},
+          {"slug":"add4","name":"(추가구매상품) 지퍼형 TPU월(카키) ","price":"-118000"},
+          {"slug":"add5","name":"(추가구매상품) 지퍼형 TPU월(블랙) ","price":"-118000"},
+          {"slug":"add6","name":"(추가구매상품) 콜팩 20cm 1개 ","price":"-166700"},
+          {"slug":"add7","name":"(추가구매상품) 이너텐트 피크닉캐노피 ","price":"-80000"}
+      ],
+  "slug":"first"}
+ ]

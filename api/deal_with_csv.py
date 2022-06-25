@@ -1,8 +1,9 @@
-import csv
-import time
 import random
 import string
+import csv, io, json, os
 from clayful import Clayful
+import urllib.request as url_lib_request
+from api.commerce.product.serializers import ClayfulOptionSerializer
 
 Clayful.config({
     'language': 'ko',
@@ -25,23 +26,23 @@ category_list = [
 ]
 
 color_list = [
-    {'name': '옐로우', 'id': '9O80C09YI5CE'},
-    {'name': '네이비', 'id': 'ZK75JKXSEXRI'},
-    {'name': '핑크', 'id': 'RWWGPYRPT0JU'},
-    {'name': '레드', 'id': 'EQJ622YESOWA'},
-    {'name': '멀티', 'id': 'GD2ZU3SMF4MX'},
-    {'name': '베이지', 'id': 'V32LLMZVIPMG'},
-    {'name': '브라운', 'id': '9FZ884Z2VX48'},
-    {'name': '블루', 'id': 'J8T65XLZYS63'},
-    {'name': '그린', 'id': 'CVD79B0XJ793'},
-    {'name': '오렌지', 'id': '4WMBHCWMSDFA'},
-    {'name': '실버', 'id': 'VUU7D9I7O6ZW'},
-    {'name': '바이올렛', 'id': 'OHDITMDLWZ5S'},
-    {'name': '블랙', 'id': '02YCN2B9EVL0'},
-    {'name': '골드', 'id': 'F77Z1HU4MN6S'},
-    {'name': '화이트', 'id': 'TUTFMB504SXH'},
-    {'name': '그레이', 'id': 'V85YY2ZZHB54'},
-    {'name': '투명', 'id': '5FQBUE2TTB3L'},
+    {'name': '옐로우', 'id': 'PTJ3UAT5R5DV'},
+    {'name': '네이비', 'id': 'KU8KB7MKTQJ7'},
+    {'name': '핑크', 'id': '6FVMGUW6FHPD'},
+    {'name': '레드', 'id': 'MPFPX5F7A4VW'},
+    {'name': '멀티', 'id': 'NNJCKNJWT8TP'},
+    {'name': '베이지', 'id': 'MFAFSJT5UWW9'},
+    {'name': '브라운', 'id': 'VN56J2HK6H4R'},
+    {'name': '블루', 'id': '7T3C5VWXS3CX'},
+    {'name': '그린', 'id': 'LMAGF9PBE2F7'},
+    {'name': '오렌지', 'id': '69GXG8WEWZE8'},
+    {'name': '실버', 'id': 'Z6MH5V5GNJF8'},
+    {'name': '바이올렛', 'id': 'HLFRR4JSQQCJ'},
+    {'name': '블랙', 'id': 'XBX7QN64NRWT'},
+    {'name': '골드', 'id': 'NWR42BW5L8HQ'},
+    {'name': '화이트', 'id': '55KHHK4R9PBE'},
+    {'name': '그레이', 'id': 'FN8YGZQW7F2R'},
+    {'name': '투명', 'id': 'ZHHR375W92FU'},
 ]
 
 
@@ -52,191 +53,248 @@ clayful_collection = Clayful.Collection
 f = open('220623.csv', 'r', encoding='utf-8')
 # wf = open('new_brand.csv', 'r', newline='', encoding='utf-8')
 # wf2 = open('new_products.csv', 'w', newline='', encoding='utf-8')
-wf2 = open('colors.csv', 'w', newline='', encoding='utf-8')
+# wf2 = open('colors.csv', 'w', newline='', encoding='utf-8')
 rdr = csv.reader(f)
 # wr = csv.writer(wf)
-wr2 = csv.writer(wf2)
+# wr2 = csv.writer(wf2)
 brand_list = []
 collection_list = []
 products = []
-color_list = set()
 
 options = {}
 brand_code = ''
-color_code = 'ZNPMJMG3EMDK'
+color_code = []
 
 for line in rdr:
-    if not line[41] == '-' and line[14] == 'instock' and int(line[25]) >= 49000 and line[59] != None and line[59] != '':
-        new_color = line[59].split(',')
-        color_list.update(new_color)
-new_color_list = list(color_list)
-
+    if not line[41] == '-' and line[14] == 'instock' and int(line[25]) >= 49000:
         # 상품 슬러그 생성
-        # code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
+        code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
         # 상품 브랜드 슬러그 구하기
-        # brand_name = line[41]
-        # with open("new_brand.csv") as f:
-        #     for l, i in enumerate(f):
-        #         data = i.split(",")
-        #         if data[1] == brand_name+'\n':
-        #             brand_code = data[0]
+        brand_name = line[41]
+        with open("new_brand.csv") as f:
+            for l, i in enumerate(f):
+                data = i.split(",")
+                if data[1] == brand_name+'\n':
+                    brand_code = data[0]
+        # 색상 슬러그 리스트로 구하기
+        if line[59] != None and line[59] != '':
+            product_colors = line[59].split(',')
+            for product in product_colors:
+                product_id = list(filter(lambda person: person['name'] == product, color_list))
+                color_code.append(product_id[0]['id'])
+        else:
+            color_code = []
 
         # 카테고리의 슬러그 구하기
-        # category_id = list(filter(lambda person: person['name'] == line[27], id_list))
-        # print(brand_code)
-        # print(category_id[0]['id'])
-        # print(category_id)
+        category_id = list(filter(lambda person: person['name'] == line[27], category_list))
+        color_code.append(category_id[0]['id'])
+        total_category = color_code
 
-        # clayful_product.create(
+        # 상품 이름
+        name = line[4]
+
+        # 상품 가격
+        original_price, discount_price = int(line[26]), int(line[25])
+
+        # 상품 상세
+        description = line[9]
+
+        # 상품 썸네일
+        thumbnail_list = line[30].split(',')
+        thumbnail_url = thumbnail_list[0]
+        thumbnail_type = thumbnail_url.split('.')[-1]
+        thumbnail_name = 'thumbnail.' + thumbnail_type
+        img_open = url_lib_request.urlretrieve(thumbnail_url, thumbnail_name)
+
+        clayful_image = Clayful.Image
+
+        thumbnail = clayful_image.create({
+            'model':  (None, 'Product'),
+            'application':  (None, 'thumbnail'),
+            'file': (
+                thumbnail_name,
+                open(thumbnail_name, 'rb'),
+                'image/jpeg'
+            ),
+        }).data['_id']
+
+        # 상품 옵션
+        variants = []
+
+        # 단일 상품인 경우
+        if line[49] == None or line[49] == '':
+            options = [
+                {
+                    'name': {
+                        'ko': '옵션',
+                    },
+                    'priority': 0,
+                    'variations': [
+                        {
+                            'value': {
+                                'ko': name
+                            },
+                            'priority': 0
+                        }
+                    ]
+                }
+            ]
+        else:
+            raw_data = json.loads(line[49])
+            data = ClayfulOptionSerializer(raw_data, many=True).data
+            variations = []
+            if len(raw_data) == 1:
+                for i in range(len(raw_data[0]['options'])):
+                    variations.append({
+                        'value': {
+                            'ko': raw_data[0]['options'][i]['name']
+                        },
+                        'priority': i
+                    })
+                options = [
+                    {
+                        'name': {
+                            'ko': raw_data[0]['name'],
+                        },
+                        'priority': 0,
+                        'variations': variations
+                    }
+                ]
+            elif len(raw_data) == 2:
+                for i in range(len(raw_data[1]['options'])):
+                    # 슬러그가 'add'로 시작하는 경우 따로 옵션을 생성.
+                    if raw_data[1]['options'][i]['slug'].isalpha():
+                        variants.append({
+                            'value': {
+                                'ko': raw_data[1]['options'][i]['name']
+                            },
+                            'priority': i
+                        })
+                    # 슬러그가 숫자인 경우 종속성을 찾아서 옵션을 만들어준다.
+                    else:
+                        dependency_name = ''
+                        has_depdendency_name = raw_data[1]['options'][i]['slug']
+                        for item in raw_data[0]['options']:
+                            if has_depdendency_name.startswith(item['slug']):
+                                dependency_name = item['slug']
+                                break
+                        else:
+                            pass
+
+                        variations.append({
+                            'value': {
+                                'ko': dependency_name + ',' + has_depdendency_name
+                            },
+                            'priority': i
+                        })
+
+                options = [
+                    {
+                        'name': {
+                            'ko': raw_data[0]['name'] + ', ' + raw_data[1]['name'],
+                        },
+                        'priority': 0,
+                        'variations': variations
+                    }
+                ]
+
+        clayful_response = clayful_product.create(
+            {
+                'slug': code,
+                'type': 'tangible',
+                'available': True,
+                'bundled': False,
+                'brand': brand_code,
+                'collections': total_category,
+                'catalogs': [
+                    {
+                        'title': {
+                            'ko': None,
+                        },
+                        'description': {
+                            'ko': None,
+                        },
+                        'image': None
+                    }
+                ],
+                'thumbnail': thumbnail,
+                'name': {
+                    'ko': name,
+                },
+                'keywords': {
+                    'ko': None,
+                },
+                'summary': {
+                    'ko': None,
+                },
+                'description': {
+                    'ko': description,
+                },
+                'manufacturer': None,
+                'origin': {
+                    'name': None
+                },
+                'price': {
+                    'original': int(original_price),
+                    'type': 'fixed'
+                },
+                'discount': {
+                    'type': 'fixed',
+                    'value': int(original_price) - int(discount_price)
+                },
+                'taxCategories': [
+                    'JF3L3N6M55Y2'
+                ],
+                'shipping': {
+                    'methods': [
+                        'B6Q2MLNJ5RJ9'
+                    ],
+                    'calculation': 'bundled'
+                },
+                'options': options,
+                'meta': {}
+            },
+            {}
+        )
+        os.remove(thumbnail_name)
+        options = clayful_response.data['options']
+        created_product_id = clayful_response.data['_id']
+        sku = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+        # clayful_product.create_variant(
+        #     created_product_id,
         #     {
-        #         'slug': code,
-        #         'type': 'tangible',
         #         'available': True,
-        #         'bundled': False,
-        #         'brand': brand_code,
-        #         'collections': [
-        #             String
-        #         ],
-        #         'catalogs': [
+        #         'sku': sku,
+        #         'thumbnail':  None,
+        #         'downloadable': None,
+        #         'types': [
         #             {
-        #                 'title': {
-        #                     '{lang}': String or None,
-        #                     ...
-        #                 },
-        #                 'description': {
-        #                     '{lang}': String or None,
-        #                     ...
-        #                 },
-        #                 'image': String or None
+        #                 'option': String,
+        #                 'variation': String
         #             }
         #         ],
-        #         'thumbnail': String or None,
-        #         'name': {
-        #             '{lang}': String or None,
-        #             ...
-        #         },
-        #         'keywords': {
-        #             '{lang}': String or None,
-        #             ...
-        #         },
-        #         'summary': {
-        #             '{lang}': String or None,
-        #             ...
-        #         },
-        #         'description': {
-        #             '{lang}': String or None,
-        #             ...
-        #         },
-        #         'manufacturer': String or None,
-        #         'origin': {
-        #             'name': String or None
-        #         },
-        #         'notices': [
-        #             {
-        #                 'slug': String,
-        #                 'title': {
-        #                     '{lang}': String or None,
-        #                     ...
-        #                 },
-        #                 'items': [
-        #                     {
-        #                         'title': {
-        #                             '{lang}': String or None,
-        #                             ...
-        #                         },
-        #                         'description': {
-        #                             '{lang}': String or None,
-        #                             ...
-        #                         }
-        #                     }
-        #                 ]
-        #             }
-        #         ],
-        #         'price': {
-        #             'original': Number,
-        #             'type': String or 'fixed' or 'dynamic'
-        #         },
+        #         'price': Number,
         #         'discount': {
-        #             'type': 'percentage' or 'fixed' or None,
-        #             'value': Number or None
+        #             'type': 'fixed',
+        #             'value': Number
         #         },
-        #         'taxCategories': [
-        #             String
-        #         ],
-        #         'shipping': {
-        #             'methods': [
-        #                 String
-        #             ],
-        #             'calculation': String or 'bundled' or 'separated' or None
-        #         },
-        #         'options': [
-        #             {
-        #                 'name': {
-        #                     '{lang}': String or None,
-        #                     ...
-        #                 },
-        #                 'priority': Number,
-        #                 'variations': [
-        #                     {
-        #                         'value': {
-        #                             '{lang}': String or None,
-        #                             ...
-        #                         },
-        #                         'priority': Number
-        #                     }
-        #                 ]
+        #         'quantity': None,
+        #         'weight': None,
+        #         'width': None,
+        #         'height': None,
+        #         'depth': None,
+        #         'policy': {
+        #             'count': None,
+        #             'expires': {
+        #                 'type':  None,
+        #                 'value': None
         #             }
-        #         ],
-        #         'bundles': [
-        #             {
-        #                 'required': Boolean,
-        #                 'name': {
-        #                     '{lang}': String or None,
-        #                     ...
-        #                 },
-        #                 'items': [
-        #                     {
-        #                         'product': String,
-        #                         'variant': String
-        #                     }
-        #                 ]
-        #             }
-        #         ],
-        #         'meta': Object
-        #     },
-        #     {}
+        #         }
+        #     }
         # )
 
-        # brand_list.append(line[41])
-        # collection_list.append(line[27])
-        # products.append(line[4])
-    # break
 
-# new_brand_list = list(set(brand_list))
-# new_collection_list = list(set(collection_list))
-# new_brand_list.sort()
-# collection_list.sort()
-# index = 0
-#
-# for collection in new_collection_list:
-#     code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
-#     wr.writerow([code, new_brand_list[index]])
-#
-#     clayful_brand.create(
-#         {
-#             'slug': code,
-#             'name': {
-#                 'ko': new_brand_list[index]
-#             },
-#             'thumbnail': None,
-#             'logo': None,
-#         },
-#         {}
-#     )
-#     wr.writerow()
-#     print(collection)
-#     time.sleep(0.5)
-#     index += 1
+    break
 
 # index = 0
 
@@ -246,56 +304,4 @@ new_color_list = list(color_list)
 
 f.close()
 # wf.close()
-wf2.close()
-
-[
-    {
-        "type":"select",
-        "name":"사이즈",
-        "options":
-            [
-                {"slug":"0","name":"아이보리 L사이즈 의자 2개","price":"0"},
-                {"slug":"1","name":"그린 L사이즈 의자 2개","price":"0"},
-                {"slug":"2","name":"아이보리 XL사이즈 의자 2개","price":"0"},
-                {"slug":"3","name":"그린 XL사이즈 의자 2개","price":"0"},
-                {"slug":"4","name":"블랙 L사이즈 의자 2개","price":"0"},
-                {"slug":"5","name":"블랙 XL사이즈 의자 2개","price":"0"}
-            ],"slug":"first"},
-    {"type":"select",
-     "name":"사은품",
-     "options":
-         [
-             {"slug":"00","name":"원목스툴","price":"0"},
-             {"slug":"01","name":"보냉백","price":"0"},
-             {"slug":"10","name":"원목스툴","price":"0"},
-             {"slug":"11","name":"보냉백","price":"0"},
-             {"slug":"20","name":"원목스툴","price":"10000"},
-             {"slug":"21","name":"보냉백","price":"10000"},
-             {"slug":"30","name":"원목스툴","price":"10000"},
-             {"slug":"31","name":"보냉백","price":"10000"},
-             {"slug":"40","name":"원목스툴","price":"0"},
-             {"slug":"41","name":"보냉백","price":"0"},
-             {"slug":"50","name":"원목스툴","price":"10000"},
-             {"slug":"51","name":"보냉백","price":"10000"}],
-     "slug":"second"}
-]
-
-
-[
-    {
-        "type":"select",
-        "name":"컬러",
-        "options":
-            [
-                {"slug":"0",
-                 "name":"블랙(기본상판)",
-                 "price":"0"},
-                {"slug":"1","name":"화이트(기본상판)","price":"0"},
-                {"slug":"2","name":"블랙(우드상판)","price":"5500"},
-                {"slug":"3","name":"화이트(우드상판)","price":"5500"},
-                {"slug":"4","name":"카키(일반상판)","price":"0"},
-                {"slug":"5","name":"탄(일반상판)","price":"0"},
-                {"slug":"add0","name":"(추가구매상품) 우드 상판 단품 ","price":"-7400"}],
-        "slug":"first"
-    }
-]
+# wf2.close()
