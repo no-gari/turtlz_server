@@ -70,7 +70,7 @@ color_code = []
 index = 0
 
 for line in rdr:
-    if index == 1000:
+    if 0 < index <= 8100:
         pass
     else:
         if not line[41] == '-' and line[14] == 'instock' and int(line[25]) >= 49000:
@@ -323,10 +323,7 @@ for line in rdr:
                 a=1
                 pass
         time.sleep(0.1)
-    if index == 500:
-        break
-    else:
-        index += 1
+    index += 1
 
 # index = 0
 

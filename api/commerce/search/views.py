@@ -1,9 +1,8 @@
-from rest_framework.pagination import PageNumberPagination
-
 from api.clayful_client import ClayfulProductClient, ClayfulBrandClient
 from api.commerce.brand.serializers import BrandListRetrieveSerializer
 from api.commerce.search.serializers import SearchKeywordSerializer
 from api.commerce.product.serializers import ProductListSerializer
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import api_view

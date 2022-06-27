@@ -22,6 +22,18 @@ def get_big_collections(request, *args, **kwargs):
         raise ValidationError({'error_msg': '카테고리를 가져오지 못했습니다.'})
 
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_banner_collections(request, *args, **kwargs):
+    clayful_collection_client = ClayfulCollectionClient()
+    try:
+        response = clayful_collection_client.get_collections(parent=settings.CLAYFUL_CAMPING_ID)
+        large_categories = CollectionRetrieveSerializers(response.data, many=True).data
+        return Response(large_categories, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '카테고리를 가져오지 못했습니다.'})
+
+
 class MainCollectionView(ListAPIView):
     def get_queryset(self):
         try:

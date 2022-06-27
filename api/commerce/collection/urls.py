@@ -1,6 +1,5 @@
 from django.urls import path
 from api.commerce.collection.views import get_big_collections, MainCollectionView, get_small_collections
-    # BannerCollectionView
 
 urlpatterns = [
     path('', get_big_collections),
