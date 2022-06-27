@@ -1,9 +1,12 @@
 import random
 import string
-import csv, io, json, os
+import csv, time, json, os
 from clayful import Clayful
 import urllib.request as url_lib_request
+from PIL import Image
 from api.commerce.product.serializers import ClayfulOptionSerializer
+from rest_framework.exceptions import ValidationError
+
 
 Clayful.config({
     'language': 'ko',
@@ -20,7 +23,7 @@ category_list = [
     {'name': '기타캠핑용품', 'id': 'MJ6CPYNUQ7GP'},
     {'name': '냉난방', 'id': 'NKKKB9V73HVU'},
     {'name': '침낭/매트', 'id': 'K53M3B3RABWD'},
-    {'name': '키친/식기','id': '9FZ884Z2VX48'},
+    {'name': '키친/식기', 'id': '9FZ884Z2VX48'},
     {'name': '조명/랜턴', 'id': 'YGLYFLLDF63T'},
     {'name': '캠핑소품', 'id': 'VWLAH5XCDFSY'},
 ]
@@ -45,7 +48,6 @@ color_list = [
     {'name': '투명', 'id': 'ZHHR375W92FU'},
 ]
 
-
 clayful_brand = Clayful.Brand
 clayful_product = Clayful.Product
 clayful_collection = Clayful.Collection
@@ -65,236 +67,266 @@ options = {}
 brand_code = ''
 color_code = []
 
+index = 0
+
 for line in rdr:
-    if not line[41] == '-' and line[14] == 'instock' and int(line[25]) >= 49000:
-        # 상품 슬러그 생성
-        code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
-        # 상품 브랜드 슬러그 구하기
-        brand_name = line[41]
-        with open("new_brand.csv") as f:
-            for l, i in enumerate(f):
-                data = i.split(",")
-                if data[1] == brand_name+'\n':
-                    brand_code = data[0]
-        # 색상 슬러그 리스트로 구하기
-        if line[59] != None and line[59] != '':
-            product_colors = line[59].split(',')
-            for product in product_colors:
-                product_id = list(filter(lambda person: person['name'] == product, color_list))
-                color_code.append(product_id[0]['id'])
-        else:
-            color_code = []
+    if index == 1000:
+        pass
+    else:
+        if not line[41] == '-' and line[14] == 'instock' and int(line[25]) >= 49000:
+            # 상품 슬러그 생성
+            code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
+            # 상품 브랜드 슬러그 구하기
+            brand_name = line[41]
+            with open("new_brand.csv") as f:
+                for l, i in enumerate(f):
+                    data = i.split(",")
+                    if data[1] == brand_name + '\n':
+                        brand_code = data[0]
+            # 색상 슬러그 리스트로 구하기
+            if line[59] != None and line[59] != '':
+                product_colors = line[59].split(',')
+                for product in product_colors:
+                    product_id = list(filter(lambda person: person['name'] == product, color_list))
+                    color_code.append(product_id[0]['id'])
+            else:
+                color_code = []
 
-        # 카테고리의 슬러그 구하기
-        category_id = list(filter(lambda person: person['name'] == line[27], category_list))
-        color_code.append(category_id[0]['id'])
-        total_category = color_code
+            # 카테고리의 슬러그 구하기
+            category_id = list(filter(lambda person: person['name'] == line[27], category_list))
+            color_code.append(category_id[0]['id'])
+            total_category = color_code
 
-        # 상품 이름
-        name = line[4]
+            # 상품 이름
+            name = line[4]
 
-        # 상품 가격
-        original_price, discount_price = int(line[26]), int(line[25])
+            # 상품 가격
+            original_price, discount_price = int(line[26]), int(line[25])
 
-        # 상품 상세
-        description = line[9]
+            # 상품 상세
+            description = line[9]
 
-        # 상품 썸네일
-        thumbnail_list = line[30].split(',')
-        thumbnail_url = thumbnail_list[0]
-        thumbnail_type = thumbnail_url.split('.')[-1]
-        thumbnail_name = 'thumbnail.' + thumbnail_type
-        img_open = url_lib_request.urlretrieve(thumbnail_url, thumbnail_name)
+            # 상품 썸네일
+            thumbnail_list = line[30].split(',')
+            thumbnail_url = thumbnail_list[0]
+            thumbnail_type = thumbnail_url.split('.')[-1]
+            thumbnail_name = 'thumbnail.' + thumbnail_type
+            img_open = url_lib_request.urlretrieve(thumbnail_url, thumbnail_name)
+            image_resize = Image.open(thumbnail_name)
+            MAX_SIZE = (800, 800)
+            image_resize.thumbnail(MAX_SIZE, Image.ANTIALIAS)
+            image_resize.save('resized_' + thumbnail_name)
 
-        clayful_image = Clayful.Image
+            clayful_image = Clayful.Image
 
-        thumbnail = clayful_image.create({
-            'model':  (None, 'Product'),
-            'application':  (None, 'thumbnail'),
-            'file': (
-                thumbnail_name,
-                open(thumbnail_name, 'rb'),
-                'image/jpeg'
-            ),
-        }).data['_id']
+            thumbnail = clayful_image.create({
+                'model': (None, 'Product'),
+                'application': (None, 'thumbnail'),
+                'file': (
+                    'resized_' + thumbnail_name,
+                    open('resized_' + thumbnail_name, 'rb'),
+                    'image/jpeg'
+                ),
+            }).data['_id']
 
-        # 상품 옵션
-        variants = []
-
-        # 단일 상품인 경우
-        if line[49] == None or line[49] == '':
-            options = [
-                {
-                    'name': {
-                        'ko': '옵션',
-                    },
-                    'priority': 0,
-                    'variations': [
+            # 상품 옵션
+            variants = []
+            try:
+                # 단일 상품인 경우
+                if line[49] == None or line[49] == '':
+                    options = [
                         {
-                            'value': {
-                                'ko': name
+                            'name': {
+                                'ko': '옵션',
                             },
-                            'priority': 0
+                            'priority': 0,
+                            'variations': [
+                                {
+                                    'value': {
+                                        'ko': name.strip()
+                                    },
+                                    'priority': 0
+                                }
+                            ]
                         }
                     ]
-                }
-            ]
-        else:
-            raw_data = json.loads(line[49])
-            data = ClayfulOptionSerializer(raw_data, many=True).data
-            variations = []
-            if len(raw_data) == 1:
-                for i in range(len(raw_data[0]['options'])):
-                    variations.append({
-                        'value': {
-                            'ko': raw_data[0]['options'][i]['name']
-                        },
-                        'priority': i
+                    variants.append({
+                        'sku': name.strip(),
+                        'discount': 0
                     })
-                options = [
+                else:
+                    raw_data = json.loads(line[49])
+                    data = ClayfulOptionSerializer(raw_data, many=True).data
+                    variations = []
+                    if len(raw_data) == 1:
+                        for i in range(len(raw_data[0]['options'])):
+                            option_name = raw_data[0]['options'][i]['name'].strip()
+                            variations.append({
+                                'value': {
+                                    'ko': option_name
+                                },
+                                'priority': i
+                            })
+                            variants.append({
+                                'sku': option_name,
+                                'discount': int(raw_data[0]['options'][i]['price'])
+                            })
+                        options = [
+                            {
+                                'name': {
+                                    'ko': raw_data[0]['name'].strip(),
+                                },
+                                'priority': 0,
+                                'variations': variations
+                            }
+                        ]
+                    elif len(raw_data) == 2:
+                        for i in range(len(raw_data[1]['options'])):
+                            # 슬러그가 'add'로 시작하는 경우 따로 옵션을 생성.
+                            if raw_data[1]['options'][i]['slug'].startswith('add'):
+                                variations.append({
+                                    'value': {
+                                        'ko': raw_data[1]['options'][i]['name'].strip()
+                                    },
+                                    'priority': i
+                                })
+                                variations.append({
+                                    'sku': raw_data[1]['options'][i]['name'].strip(),
+                                    'discount': int(raw_data[1]['options'][i]['price'])
+                                })
+                            # 슬러그가 숫자인 경우 종속성을 찾아서 옵션을 만들어준다.
+                            else:
+                                dependency_name = ''
+                                dependency_price = 0
+                                has_depdendency_name = raw_data[1]['options'][i]['name'].strip()
+                                has_dependency_slug = raw_data[1]['options'][i]['slug']
+                                for item in raw_data[0]['options']:
+                                    if has_dependency_slug.startswith(item['slug']):
+                                        dependency_name = item['name'].strip()
+                                        dependency_price = int(item['price'])
+                                        break
+                                else:
+                                    pass
+
+                                variations.append({
+                                    'value': {
+                                        'ko': dependency_name + ',' + has_depdendency_name
+                                    },
+                                    'priority': i
+                                })
+                                variants.append({
+                                    'sku': dependency_name + ', ' + has_depdendency_name,
+                                    'discount': dependency_price + int(raw_data[1]['options'][i]['price'])
+                                })
+
+                        options = [
+                            {
+                                'name': {
+                                    'ko': raw_data[0]['name'].strip() + ', ' + raw_data[1]['name'].strip(),
+                                },
+                                'priority': 0,
+                                'variations': variations
+                            }
+                        ]
+
+                clayful_response = clayful_product.create(
                     {
+                        'slug': code,
+                        'type': 'tangible',
+                        'available': True,
+                        'bundled': False,
+                        'brand': brand_code,
+                        'collections': total_category,
+                        'catalogs': [
+                            {
+                                'title': {
+                                    'ko': None,
+                                },
+                                'description': {
+                                    'ko': None,
+                                },
+                                'image': None
+                            }
+                        ],
+                        'thumbnail': thumbnail,
                         'name': {
-                            'ko': raw_data[0]['name'],
+                            'ko': name,
                         },
-                        'priority': 0,
-                        'variations': variations
-                    }
-                ]
-            elif len(raw_data) == 2:
-                for i in range(len(raw_data[1]['options'])):
-                    # 슬러그가 'add'로 시작하는 경우 따로 옵션을 생성.
-                    if raw_data[1]['options'][i]['slug'].isalpha():
-                        variants.append({
-                            'value': {
-                                'ko': raw_data[1]['options'][i]['name']
-                            },
-                            'priority': i
-                        })
-                    # 슬러그가 숫자인 경우 종속성을 찾아서 옵션을 만들어준다.
-                    else:
-                        dependency_name = ''
-                        has_depdendency_name = raw_data[1]['options'][i]['slug']
-                        for item in raw_data[0]['options']:
-                            if has_depdendency_name.startswith(item['slug']):
-                                dependency_name = item['slug']
-                                break
-                        else:
-                            pass
-
-                        variations.append({
-                            'value': {
-                                'ko': dependency_name + ',' + has_depdendency_name
-                            },
-                            'priority': i
-                        })
-
-                options = [
-                    {
-                        'name': {
-                            'ko': raw_data[0]['name'] + ', ' + raw_data[1]['name'],
+                        'keywords': {
+                            'ko': None,
                         },
-                        'priority': 0,
-                        'variations': variations
-                    }
-                ]
-
-        clayful_response = clayful_product.create(
-            {
-                'slug': code,
-                'type': 'tangible',
-                'available': True,
-                'bundled': False,
-                'brand': brand_code,
-                'collections': total_category,
-                'catalogs': [
-                    {
-                        'title': {
+                        'summary': {
                             'ko': None,
                         },
                         'description': {
-                            'ko': None,
+                            'ko': description,
                         },
-                        'image': None
-                    }
-                ],
-                'thumbnail': thumbnail,
-                'name': {
-                    'ko': name,
-                },
-                'keywords': {
-                    'ko': None,
-                },
-                'summary': {
-                    'ko': None,
-                },
-                'description': {
-                    'ko': description,
-                },
-                'manufacturer': None,
-                'origin': {
-                    'name': None
-                },
-                'price': {
-                    'original': int(original_price),
-                    'type': 'fixed'
-                },
-                'discount': {
-                    'type': 'fixed',
-                    'value': int(original_price) - int(discount_price)
-                },
-                'taxCategories': [
-                    'JF3L3N6M55Y2'
-                ],
-                'shipping': {
-                    'methods': [
-                        'B6Q2MLNJ5RJ9'
-                    ],
-                    'calculation': 'bundled'
-                },
-                'options': options,
-                'meta': {}
-            },
-            {}
-        )
-        os.remove(thumbnail_name)
-        options = clayful_response.data['options']
-        created_product_id = clayful_response.data['_id']
-        sku = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
-        # clayful_product.create_variant(
-        #     created_product_id,
-        #     {
-        #         'available': True,
-        #         'sku': sku,
-        #         'thumbnail':  None,
-        #         'downloadable': None,
-        #         'types': [
-        #             {
-        #                 'option': String,
-        #                 'variation': String
-        #             }
-        #         ],
-        #         'price': Number,
-        #         'discount': {
-        #             'type': 'fixed',
-        #             'value': Number
-        #         },
-        #         'quantity': None,
-        #         'weight': None,
-        #         'width': None,
-        #         'height': None,
-        #         'depth': None,
-        #         'policy': {
-        #             'count': None,
-        #             'expires': {
-        #                 'type':  None,
-        #                 'value': None
-        #             }
-        #         }
-        #     }
-        # )
+                        'manufacturer': None,
+                        'origin': {
+                            'name': None
+                        },
+                        'price': {
+                            'original': int(original_price),
+                            'type': 'fixed'
+                        },
+                        'discount': {
+                            'type': 'fixed',
+                            'value': int(original_price) - int(discount_price)
+                        },
+                        'taxCategories': [
+                            'JF3L3N6M55Y2'
+                        ],
+                        'shipping': {
+                            'methods': [
+                                'B6Q2MLNJ5RJ9'
+                            ],
+                            'calculation': 'bundled'
+                        },
+                        'options': options,
+                        'meta': {}
+                    },
+                    {}
+                )
+                os.remove(thumbnail_name)
+                options = clayful_response.data['options']
+                created_product_id = clayful_response.data['_id']
+                sku = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+                option_id = options[0]['_id']
+                for item in variants:
+                    variation_id = list(filter(lambda variation: variation['value']['ko'] == item['sku'], options[0]['variations']))
+                    variation_string = (variation_id[0]['_id'])
 
-
-    break
+                    try:
+                        clayful_variant_response = clayful_product.create_variant(created_product_id,
+                           {
+                               'available': True,
+                               'sku': ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8)),
+                               'thumbnail': None,
+                               'types': [
+                                   {
+                                       'option': option_id,
+                                       'variation': variation_string
+                                   }
+                               ],
+                               'price': discount_price + item['discount'],
+                               'quantity': None,
+                               'weight': 1,
+                               'width': 1,
+                               'height': 1,
+                               'depth': 1,
+                           }, {}
+                        )
+                    except Exception as err:
+                        print(err.message)
+                        raise ValidationError({'error_msg': [err.message]})
+            except:
+                a=1
+                pass
+        time.sleep(0.1)
+    if index == 500:
+        break
+    else:
+        index += 1
 
 # index = 0
 

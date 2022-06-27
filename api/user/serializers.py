@@ -1,12 +1,10 @@
 import random
 import hashlib
-import requests
-from urllib.parse import urlparse
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from api.logger.models import PhoneLog
 from rest_framework import serializers
-from django.core.files.base import ContentFile
 from api.user.validators import validate_password
 from api.clayful_client import ClayfulCustomerClient
 from django.contrib.auth.hashers import make_password
@@ -24,14 +22,12 @@ class UserSocialLoginSerializer(serializers.Serializer):
     email = serializers.CharField(write_only=True)
     nickname = serializers.CharField(write_only=True)
     social_type = serializers.CharField(write_only=True)
-    profile_image_url = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         code = attrs['code']
         email = attrs['email']
         nickname = attrs['nickname']
         social_type = attrs['social_type']
-        profile_image_url = attrs['profile_image_url']
 
         if social_type not in SocialKindChoices:
             raise ValidationError({'kind': '지원하지 않는 소셜 타입입니다.'})
@@ -44,7 +40,6 @@ class UserSocialLoginSerializer(serializers.Serializer):
         email = validated_data['email']
         nickname = validated_data['nickname']
         social_type = validated_data['social_type']
-        profile_image_url = validated_data['profile_image_url']
         user, created = User.objects.get_or_create(email=email, defaults={'password': make_password(None)})
 
         if created:
@@ -59,16 +54,9 @@ class UserSocialLoginSerializer(serializers.Serializer):
                 token = clayful_login.data['token']
 
             user_profile = Profile.objects.create(user=user, clayful_token=token, nickname=nickname, kind=social_type, code=code)
-
-            if profile_image_url != '':
-                name = urlparse(profile_image_url).path.split('/')[-1]
-                response = requests.get(profile_image_url)
-                user_profile.profile_image.save(name, ContentFile(response.content), save=True)
+            clayful_customer_client.clayful_customer_add_coupon(customer_id=token, coupon_id=settings.CLAYFUL_COUPON_ID)
             user_profile.save()
 
-        else:
-            a=1
-            b=2
         refresh = RefreshToken.for_user(user)
         return {
             'access': refresh.access_token,
