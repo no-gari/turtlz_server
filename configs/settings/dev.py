@@ -3,7 +3,7 @@ import pymysql
 import os
 
 pymysql.install_as_MySQLdb()
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
 DB = 'mysql'
@@ -29,7 +29,7 @@ if DB == 'mysql':
     }
 
 # S3
-USE_S3 = False
+USE_S3 = True
 
 if USE_S3:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

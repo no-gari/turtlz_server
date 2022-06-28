@@ -28,10 +28,6 @@ def order_create(request, *args, **kwargs):
         payload = OrderSerializer(request.data).data
         response = clf_client.checkout_cart(items=items, payload=payload)
         if response.status == 201:
-            new_response = response
-
-
-
             return Response(PaymentSerializer(response.data['order']).data, status=status.HTTP_200_OK)
     except:
         raise ValidationError({'error_msg': '주문에 실패했습니다.'})
