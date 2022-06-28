@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import CollectionModel
 
 
 class CollectionRetrieveSerializers(serializers.Serializer):
@@ -8,3 +9,9 @@ class CollectionRetrieveSerializers(serializers.Serializer):
 
     def get_thumbnail(self, value):
         return value['thumbnail']['url']
+
+
+class PopUpCollectionRetrieveSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CollectionModel
+        fields = '__all__'
