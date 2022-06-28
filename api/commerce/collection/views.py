@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from .models import CollectionModel
 from rest_framework import status
 from django.conf import settings
 
@@ -66,5 +67,15 @@ def get_small_collections(request, *args, **kwargs):
         large_categories = CollectionRetrieveSerializers(response.data, many=True).data
         serializer = CollectionRetrieveSerializers(large_categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '카테고리를 가져오지 못했습니다.'})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_pop_up_collection(request, *args, **kwargs):
+    try:
+        collection = CollectionRetrieveSerializers(CollectionModel.objects.all(), many=True).data
+        return Response(collection, status=status.HTTP_200_OK)
     except:
         raise ValidationError({'error_msg': '카테고리를 가져오지 못했습니다.'})
