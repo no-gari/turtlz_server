@@ -1,4 +1,4 @@
-from api.commerce.collection.serializers import CollectionRetrieveSerializers
+from api.commerce.collection.serializers import CollectionRetrieveSerializers, PopUpCollectionRetrieveSerializers
 from api.clayful_client import ClayfulCollectionClient, ClayfulProductClient
 from rest_framework.decorators import api_view, permission_classes
 from api.commerce.product.serializers import ProductListSerializer
@@ -75,7 +75,7 @@ def get_small_collections(request, *args, **kwargs):
 @permission_classes([AllowAny])
 def get_pop_up_collection(request, *args, **kwargs):
     try:
-        collection = CollectionRetrieveSerializers(CollectionModel.objects.all(), many=True).data
+        collection = PopUpCollectionRetrieveSerializers(CollectionModel.objects.all(), many=True).data
         return Response(collection, status=status.HTTP_200_OK)
     except:
         raise ValidationError({'error_msg': '카테고리를 가져오지 못했습니다.'})
