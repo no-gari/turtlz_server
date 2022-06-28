@@ -52,9 +52,10 @@ class UserSocialLoginSerializer(serializers.Serializer):
             else:
                 clayful_login = clayful_customer_client.clayful_login(email=email)
                 token = clayful_login.data['token']
+                user_id = clayful_login.data['customer']
 
             user_profile = Profile.objects.create(user=user, clayful_token=token, nickname=nickname, kind=social_type, code=code)
-            clayful_customer_client.clayful_customer_add_coupon(customer_id=token, coupon_id=settings.CLAYFUL_COUPON_ID)
+            clayful_customer_client.clayful_customer_add_coupon(customer_id=user_id, coupon_id=settings.CLAYFUL_COUPON_ID)
             user_profile.save()
 
         refresh = RefreshToken.for_user(user)

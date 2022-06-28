@@ -34,48 +34,28 @@ def get_banner_collections(request, *args, **kwargs):
         raise ValidationError({'error_msg': '카테고리를 가져오지 못했습니다.'})
 
 
-class MainCollectionView(ListAPIView):
-    def get_queryset(self):
-        try:
-            brand = self.kwargs.get('brand', 'any')
-            if self.kwargs.get('category') == '':
-                category = settings.CLAYFUL_COLLECTION_ID
-            else:
-                category = self.kwargs.get('category', 'any')
-            sort = self.request.query_params.get('sort', 'rating.count')
-            page = self.request.query_params.get('page', '1')
-            clayful_product_client = ClayfulProductClient()
-            products = clayful_product_client.list_products(collection=category, page=page, sort=sort, brand=brand)
-            if not products.status == 200:
-                raise ValidationError({'error_msg': '서버 에러입니다. 잠시 후 다시 시도해주세요.'})
-            return products.data
-        except Exception:
-            raise ValidationError({'error_msg': '상품을 불러올 수 없습니다.'})
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_main_collections(request, *args, **kwargs):
+    clayful_collection_client = ClayfulCollectionClient()
+    clayful_product_client = ClayfulProductClient()
+    try:
+        collections = clayful_collection_client.get_collections(parent=settings.CLAYFUL_COLLECTION_ID).data
+        main_collections = []
+        for collection in collections:
+            product_response = clayful_product_client.list_products(collection=collection['_id'], page=1, sort='rating.count', brand='any').data
+            product_serialized_data = ProductListSerializer(product_response, many=True).data
+            main_collections.append({
+                'collection': {
+                    '_id': collection['_id'],
+                    'name': collection['name'],
+                    'thumbnail': ''
+                }, 'products': product_serialized_data
+            })
+        return Response(main_collections, status=status.HTTP_200_OK)
+    except:
+        raise ValidationError({'error_msg': '메인 콜렉션을 가져오지 못했습니다.'})
 
-    def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.get_queryset()
-            brand = self.kwargs.get('brand', 'any')
-            if self.kwargs.get('category') == '':
-                category = settings.CLAYFUL_COLLECTION_ID
-            else:
-                category = self.kwargs.get('category', 'any')
-            page = int(self.request.query_params.get('page', '1'))
-            clf_product_client = ClayfulProductClient()
-            serializer = ProductListSerializer(queryset, many=True)
-            if not serializer.data == []:
-                response = {'previous': str(int(page)-1), 'next':  str(int(page)+1), 'count': 10, 'results': serializer.data}
-            else:
-                response = {
-                    'previous': None, 'next': None, 'count': None,
-                    'result': {
-                        '_id': None, 'name': None, 'hashtags': None, 'rating': None, 'original_price': None,
-                        'discount_price': None, 'discount_rate': None, 'brand': None, 'thumbnail': None
-                    }
-                }
-            return Response(response, status=status.HTTP_200_OK)
-        except Exception:
-            raise ValidationError({'error_msg': '상품을 불러올 수 없습니다.'})
 
 @api_view(["GET"])
 @permission_classes([AllowAny])

@@ -6,7 +6,7 @@ pymysql.install_as_MySQLdb()
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
-DB = 'sqlite'
+DB = 'mysql'
 
 if DB == 'sqlite':
     DATABASES = {
@@ -27,7 +27,6 @@ if DB == 'mysql':
             'PORT': '3306',
         }
     }
-
 
 # S3
 USE_S3 = False
