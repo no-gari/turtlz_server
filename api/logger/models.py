@@ -18,9 +18,6 @@ class PointLog(models.Model):
         verbose_name_plural = verbose_name
         ordering = ['-created']
 
-    def __str__(self):
-        return self.user.username + ' ' + str(self.amount) + '포인트 적립' if self.add is True else '포인트 사용'
-
 
 class EmailLog(models.Model):
     to = models.EmailField(verbose_name='수신자')

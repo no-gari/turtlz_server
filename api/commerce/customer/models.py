@@ -15,9 +15,6 @@ class UserShipping(models.Model):
         verbose_name = '유저 배송지'
         verbose_name_plural = '유저 배송지'
 
-    def __str__(self):
-        return self.user.name + '의 배송지' + str(self.id)
-
 
 class ShippingRequest(models.Model):
     content = models.CharField(verbose_name='요구사항', max_length=64)
