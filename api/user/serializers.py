@@ -5,6 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 from api.logger.models import PhoneLog
 from rest_framework import serializers
+from django.core.validators import validate_email
 from api.user.validators import validate_password
 from api.clayful_client import ClayfulCustomerClient
 from django.contrib.auth.hashers import make_password
@@ -66,96 +67,53 @@ class UserSocialLoginSerializer(serializers.Serializer):
 
 
 class UserRegisterSerializer(serializers.Serializer):
-    email = serializers.CharField(write_only=True, required=False)
-    email_token = serializers.CharField(write_only=True, required=False)
-    name = serializers.CharField(write_only=True)
-    phone = serializers.CharField(write_only=True, required=False)
-    phone_token = serializers.CharField(write_only=True, required=False)
-    password = serializers.CharField(write_only=True, required=False)
-    password_confirm = serializers.CharField(write_only=True, required=False)
-
-    access = serializers.CharField()
+    email = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
+    access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
-
-    def get_fields(self):
-        fields = super().get_fields()
-
-        if 'email' in User.VERIFY_FIELDS:
-            fields['email_token'].required = True
-        if 'email' in User.VERIFY_FIELDS or 'email' in User.REGISTER_FIELDS:
-            fields['email'].required = True
-        if 'phone' in User.VERIFY_FIELDS:
-            fields['phone_token'].required = True
-        if 'phone' in User.VERIFY_FIELDS or 'phone' in User.REGISTER_FIELDS:
-            fields['phone'].required = True
-        if 'password' in User.REGISTER_FIELDS:
-            fields['password'].required = True
-            fields['password_confirm'].required = True
-
-        return fields
 
     def validate(self, attrs):
         email = attrs.get('email')
-        email_token = attrs.pop('email_token', None)
-        phone = attrs.get('phone')
-        phone_token = attrs.pop('phone_token', None)
 
-        password = attrs.get('password')
-        password_confirm = attrs.pop('password_confirm', None)
-
-        if 'email' in User.VERIFY_FIELDS:
-            # 이메일 토큰 검증
-            try:
-                self.email_verifier = EmailVerifier.objects.get(email=email, token=email_token)
-            except EmailVerifier.DoesNotExist:
-                raise ValidationError('이메일 인증을 진행해주세요.')
-        if 'email' in User.VERIFY_FIELDS or 'email' in User.REGISTER_FIELDS:
-            # 이메일 검증
+        if 'email' in User.REGISTER_FIELDS:
             if User.objects.filter(email=email).exists():
                 raise ValidationError({'email': ['이미 가입된 이메일입니다.']})
+        return attrs
 
-        if 'phone' in User.VERIFY_FIELDS:
-            # 휴대폰 토큰 검증
-            try:
-                self.phone_verifier = PhoneVerifier.objects.get(phone=phone, token=phone_token)
-            except PhoneVerifier.DoesNotExist:
-                raise ValidationError('휴대폰 인증을 진행해주세요.')
-        if 'phone' in User.VERIFY_FIELDS or 'phone' in User.REGISTER_FIELDS:
-            # 휴대폰 검증
-            if User.objects.filter(phone=phone).exists():
-                raise ValidationError({'phone': ['이미 가입된 휴대폰입니다.']})
+    def validate(self, attrs):
+        email = attrs['email']
+        password = attrs['password']
 
-        if 'password' in User.REGISTER_FIELDS:
-            errors = {}
-            # 비밀번호 검증
-            if password != password_confirm:
-                errors['password'] = ['비밀번호가 일치하지 않습니다.']
-                errors['password_confirm'] = ['비밀번호가 일치하지 않습니다.']
-            else:
-                try:
-                    validate_password(password)
-                except DjangoValidationError as error:
-                    errors['password'] = list(error)
-                    errors['password_confirm'] = list(error)
-
-            if errors:
-                raise ValidationError(errors)
+        try:
+            validate_email(email)
+        except:
+            raise ValidationError({'error_msg': '이메일 형식이 아닙니다.'})
 
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
-        user = User.objects.create_user(
-            **validated_data,
-        )
-        Profile.objects.create(user=user)
-        if 'email' in User.VERIFY_FIELDS:
-            self.email_verifier.delete()
-        if 'phone' in User.VERIFY_FIELDS:
-            self.phone_verifier.delete()
+        email = validated_data['email']
+        password = validated_data['password']
+        user, created = User.objects.get_or_create(email=email, defaults={'password': make_password(password)})
+
+        if created:
+            clayful_customer_client = ClayfulCustomerClient()
+            clayful_register = clayful_customer_client.clayful_register(email=email, nickname='용감한 거북이')
+
+            if not clayful_register.status == 201:
+                user.delete()
+                raise ValidationError({'error_msg': '서버 에러입니다. 다시 시도해주세요.'})
+            else:
+                clayful_login = clayful_customer_client.clayful_login(email=email)
+                token = clayful_login.data['token']
+                user_id = clayful_login.data['customer']
+
+            user_profile = Profile.objects.create(user=user, clayful_token=token, nickname='용감한 거북이')
+            clayful_customer_client.clayful_customer_add_coupon(customer_id=user_id, coupon_id=settings.CLAYFUL_COUPON_ID)
+            user_profile.save()
 
         refresh = RefreshToken.for_user(user)
-
         return {
             'access': refresh.access_token,
             'refresh': refresh,
