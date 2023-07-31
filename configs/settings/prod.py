@@ -16,19 +16,6 @@ if DB == 'sqlite':
         }
     }
 
-if DB == 'mysql':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'turtlzrds',
-            'USER': 'turtlzrds',
-            'PASSWORD': 'turtlzrds123!',
-            'HOST': 'turtlzrds.cp5koktxnub1.ap-northeast-2.rds.amazonaws.com',
-            'PORT': '3306',
-        }
-    }
-
-
 # S3
 USE_S3 = False
 
@@ -41,8 +28,6 @@ AWS_REGION = 'ap-northeast-2'
 AWS_STORAGE_BUCKET_NAME = 'turtlz'
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_HOST = 's3.%s.amazonaws.com' % AWS_REGION
-AWS_ACCESS_KEY_ID = 'AKIAU33ZJBGVUBKXQDHF'
-AWS_SECRET_ACCESS_KEY = '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'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_DEFAULT_ACL = None
 AWS_S3_OBJECT_PARAMETERS = {
